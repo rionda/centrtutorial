@@ -1,0 +1,16 @@
+Centrality measures allow to measure the relative importance of a node or an
+edge in a graph w.r.t. other nodes or edges. Many measures of centrality have
+been developed in the literature to capture different aspects of the informal
+concept of importance, and algorithms for different measures have been proposed.
+In this tutorial, we survey the different definitions of centrality measures and
+the algorithms to compute them. We start from the most common measures (e.g.,
+closeness centrality, betweenness centrality) and move to more complex ones,
+like spanning-edge centrality. In our presentation, we begin
+from exact algorithms and then move to approximation algorithms, including
+sampling-based ones, and to highly-scalable MapReduce algorithms for huge
+graphs, both for exact computation and for keeping the measures up-to-date on
+dynamic graphs where edges are inserted or deleted over time.
+Our goal is to show how advanced algorithmic techniques and scalable systems can
+be used to obtain efficient algorithms for important graph mining tasks, and
+to encourage research in the area by highlighting open problems and possible
+directions.

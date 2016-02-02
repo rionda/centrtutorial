@@ -1,0 +1,336 @@
+\documentclass[11pt]{article}
+\usepackage[top=1in, bottom=1.25in, left=1.25in, right=1.25in]{geometry}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage[numbers,square,sort&compress]{natbib}
+\renewcommand{\refname}{References}
+\renewcommand{\bibsection}{\subsection*{References}}
+\renewcommand*{\bibfont}{\raggedright}
+\usepackage{mdwlist}
+
+\renewcommand{\labelenumi}{\arabic{enumi}.}
+\renewcommand{\labelenumii}{\arabic{enumi}.\arabic{enumii}}
+
+\newcommand{\spara}[1]{\smallskip\noindent{\bf #1}}
+\newcommand{\para}[1]{\noindent{\bf #1}}
+
+\title{Centrality Measures on Big Graphs:\\Exact, Approximated, and Distributed
+Algorithms \\ {\small Proposal for a half-day tutorial at WWW'16}}
+
+\author{
+	Francesco Bonchi\footnote{ISI Foundation, Turin Italy.
+	\texttt{francescobonchi@acm.org}} \and Gianmarco De
+	Francisci Morales\footnote{Aalto University, Helsinki, Finland.
+	\texttt{gdfm@acm.org}} \and Matteo
+	Riondato\footnote{Two Sigma Investments, New York, NY, USA.
+	\texttt{matteo@twosigma.com}. Main contact}
+	%\email{francescobonchi@acm.org} \email{gdfm@acm.org} \email{matteo@twosigma.com}
+}
+\date{}
+\begin{document}
+\maketitle
+
+\section*{Topic and description}
+Identifying ``important'' nodes or edges in a graph is a fundamental task
+in network analysis, with many applications. Several measures, known as
+\emph{centrality indices}, have been proposed over the years, each formalizing the
+concept of importance in a different way~\citep{Newman10}. Centrality measures
+rely on graph properties to quantify importance. For example, betweenness
+centrality considers the fraction of shortest paths going through a
+node or edge, while the closeness centrality of a node is the average sum of the inverse
+of the distance to every other node. Other centrality measures use eigenvectors,
+random walks, degrees, or more complex properties, and can usually be extended to sets of nodes.
+
+With the proliferation of huge networks with millions of nodes and billions of
+edges, the importance of having scalable algorithms for computing centrality
+indices has become more and more evident, and a number of contributions have been
+recently made, ranging from heuristics that perform extremely well in
+practice, to approximation algorithms with strong probabilistic guarantees,
+to scalable algorithms for the MapReduce platform. Moreover, the dynamic nature
+of many networks, i.e., the addition and removal of nodes and edges over
+time, dictates the need to keep the computed values of centrality up-to-date as
+the graph changes. These challenging problems have enjoyed enormous interest
+from the research community, resulting in several relevant approaches proposed recently
+to tackle them.
+
+Our tutorial presents, in a unified framework, some of the different measures of
+centrality, and discusses the algorithms to compute them, both in an exact and in
+an approximate way, both in-memory and in a distributed fashion for the
+MapReduce framework of computation. Our tutorial represents an effort to ease the
+comparison between different measures, the different quality guarantees offered
+by approximation algorithms, and the different trade-offs and scalability
+behaviors characterizing distributed algorithms. We believe this unity
+of presentation is beneficial both for newcomers and for experienced researchers
+in the field.
+
+\clearpage
+
+\subsection*{Outline}
+The tutorial is structured in three main technical parts, plus a concluding part
+where we discuss future research directions. All the three technical parts will
+contains both theory and experimental results.
+
+\begin{enumerate}
+	\item {\bf Introduction: definitions and exact algorithms}
+		\begin{enumerate}
+			\item The axioms of centrality~\citep{BoldiV14}
+			\item Definitions of centrality~\citep{Newman10}, including, but not
+				limited to: betweenness, closeness, degree, eigenvector,
+				harmonic, Katz, absorbing random-walk~\citep{MavroforakisMG15},
+				and spanning-edge centrality~\citep{MavroforakisGLKT15}.
+			\item Betweenness centrality: exact algorithm~\citep{Brandes01} and
+				heuristically-faster exact algorithms for betweenness
+				centrality~\citep{ErdosIBT15,SaryuceSKC13}.
+			\item Exact algorithms for betweenness centrality in a dynamic
+				graph~\citep{LeeLPCC12,NasrePR14,PontecorviR15}.
+			\item Exact algorithms for closeness centrality in a dynamic
+				graph~\citep{SariyuceKSC13b}.
+		\end{enumerate}
+	\item {\bf Approximation algorithms}
+		\begin{enumerate}
+			\item Sampling-based algorithm for closeness
+				centrality~\citep{EppsteinW04}.
+			\item Betweenness centrality: almost-linear-time approximation
+				algorithm~\citep{Yoshida14}, basic sampling-based
+				algorithm~\citep{BrandesP07}, refined
+				estimators~\citep{GeisbergerSS08}, VC-dimension bounds for
+				betweenness centrality~\citep{RiondatoK15}.
+			\item Approximation algorithms for betweenness centrality in dynamic
+				graphs~\citep{KasWCC13,BergaminiMS14,BergaminiM15}.
+		\end{enumerate}
+	\item {\bf Highly-scalable algorithms}
+		\begin{enumerate}
+			\item GPU-based algorithms~\citep{SariyuceKSC13}.
+			\item Exact parallel streaming algorithm for betweenness centrality in a
+				dynamic graph~\citep{KourtellisMB15}.
+		\end{enumerate}
+	\item {\bf Challenges and directions for future research}
+\end{enumerate}
+
+\section*{Intended Audience}
+The tutorial is aimed at researchers interested in the theory and the
+applications of algorithms for graph mining and social network analysis.
+
+We do not require any specific existing knowledge. The tutorial is designed for
+an audience of computer scientists who have a general idea of the problems and
+challenges in graph analysis. We will present the material in such a way that
+any advanced undergraduate student would be able to productively follow our
+tutorial. %
+%and we will actively engage with the audience and adapt our pace and style to ensure
+%that every attendee can benefit from our tutorial.
+The tutorial starts from the basic definitions and progressively moves to more advanced
+algorithms, including sampling-based approximation algorithms and MapReduce
+algorithms, so that it will be of interest both to researchers new
+to the field and to a more experienced audience.
+
+\section*{Duration: \textrm{Half-day}}
+
+\section*{Previous editions of the tutorial}
+The tutorial was not previously offered. We did not find any tutorial covering
+similar topics in the programs of recent relevant conferences.
+
+\vspace{-10pt}
+\section*{Organizers}
+This tutorial is developed by Francesco Bonchi, Gianmarco De Francisci Morales,
+and Matteo Riondato. All three instructors will attend the conference.
+
+\para{Francesco Bonchi} is Research Leader at the ISI Foundation, Turin, Italy,
+where he leads the "Algorithmic Data Analytics" group. He is also Scientific
+Director for Data Mining at Eurecat (Technological Center of Catalunya),
+Barcelona. Before he was Director of Research at Yahoo Labs in Barcelona, Spain,
+leading the Web Mining Research group.
+
+His recent research interests include mining query-logs, social networks, and
+social media, as well as the privacy issues related to mining these kinds of
+sensible data.
+%In the past he has been interested in data mining query
+%languages, constrained pattern mining, mining spatiotemporal and mobility data,
+%and privacy preserving data mining.
+
+He will be PC Chair of the 16th IEEE International Conference on Data Mining
+(ICDM 2016) to be held in Barcelona in December 2016. He is member of the ECML
+PKDD Steering Committee, Associate Editor of the newly created IEEE Transactions
+on Big Data (TBD), of the IEEE Transactions on Knowledge and Data Engineering
+(TKDE), the ACM Transactions on Intelligent Systems and Technology (TIST),
+Knowledge and Information Systems (KAIS), and member of the Editorial Board of
+Data Mining and Knowledge Discovery (DMKD). %
+%He has been program co-chair of the
+%European Conference on Machine Learning and Principles and Practice of Knowledge
+%Discovery in Databases (ECML PKDD 2010). Dr. Bonchi has also served as program
+%co-chair of the first and second ACM SIGKDD International Workshop on Privacy,
+%Security, and Trust in KDD (PinKDD 2007 and 2008), the 1st IEEE International
+%Workshop on Privacy Aspects of Data Mining (PADM 2006), and the 4th
+%International Workshop on Knowledge Discovery in Inductive Databases (KDID
+%2005).
+%He is co-editor of the book "Privacy-Aware Knowledge Discovery: Novel
+%Applications and New Techniques" published by Chapman \& Hall/CRC Press.
+%He earned his Ph.D. in computer science from the University of Pisa in December 2003.
+He presented a tutorial at ACM KDD'14.
+
+\para{Gianmarco De Francisci Morales} is a Visiting Scientist at Aalto
+University. Previously he worked as a Research Scientist at Yahoo Labs
+Barcelona, and as a Research Associate at ISTI-CNR in Pisa. His research focuses
+on scalable data mining, with an emphasis on Web mining and data-intensive
+scalable computing systems.
+%He is an active member of the open source community of the Apache Software Foundation, working on the Hadoop ecosystem, and a committer for the Apache Pig project.
+He is one of the lead developers of Apache SAMOA, an open-source platform for
+mining big data streams. He presented a tutorial on stream mining at IEEE
+BigData'14.
+
+\para{Matteo Riondato} is a Research Scientist in the Labs group at Two Sigma
+Investments. Previously he was a postdoc at Stanford and at Brown. His
+dissertation on sampling-based randomized algorithms for data and graph mining
+received the Best Student Poster Award at SIAM SDM'14. His research focuses on
+exploiting advanced theory to develop practical algorithms for time series
+analysis, pattern mining, and social network analysis. He presented
+tutorials at ACM KDD'15, ECML PKDD'15, and ACM CIKM'15.
+
+\subsection*{Support materials}
+We are developing a mini-website at
+\url{http://matteo.rionda.to/centrtutorial/}. It will contain the
+abstract of the tutorial, a detailed outline with short a description of
+each item of the outline, a full list of references with links to
+electronic editions, a list of software packages implementing the
+algorithms, and the slides used in the tutorial presentation. A preliminary version of the
+website will be available 15 days after the tutorial is accepted. A preliminary
+version of the slides will be available 30 days before the conference, or in any
+case by any deadline given to us by the conference organizers, and the final
+version will be available 15 days before the conference.
+
+%\bibliographystyle{abbrvnat}
+%\bibliography{centrtutorial}
+
+\setlength{\bibsep}{0pt}
+\begin{thebibliography}{22}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Bergamini and Meyerhenke(2015)]{BergaminiM15}
+E.~Bergamini and H.~Meyerhenke.
+\newblock Fully-dynamic approximation of betweenness centrality.
+\newblock ESA'15, 2015.
+
+\bibitem[Bergamini et~al.(2014)Bergamini, Meyerhenke, and
+  Staudt]{BergaminiMS14}
+E.~Bergamini, H.~Meyerhenke, and C.~L. Staudt.
+\newblock Approximating betweenness centrality in large evolving networks.
+\newblock ALENEX'15, 2015.
+
+\bibitem[Boldi and Vigna(2014)]{BoldiV14}
+P.~Boldi and S.~Vigna.
+\newblock Axioms for centrality.
+\newblock \emph{Internet Mathematics}, 10\penalty0 (3--4):\penalty0 222--262,
+  2014.
+
+\bibitem[Brandes(2001)]{Brandes01}
+U.~Brandes.
+\newblock A faster algorithm for betweenness centrality.
+\newblock \emph{J. Math. Sociol.}, 25\penalty0 (2):\penalty0 163--177, 2001.
+
+\bibitem[Brandes and Pich(2007)]{BrandesP07}
+U.~Brandes and C.~Pich.
+\newblock Centrality estimation in large networks.
+\newblock \emph{Int. J. Bifurcation and Chaos}, 17\penalty0 (7):\penalty0
+  2303--2318, 2007.
+
+\bibitem[Eppstein and Wang(2004)]{EppsteinW04}
+D.~Eppstein and J.~Wang.
+\newblock Fast approximation of centrality.
+\newblock \emph{J. Graph Algorithms Appl.}, 8\penalty0 (1):\penalty0 39--45,
+  2004.
+
+\bibitem[Erd\H{o}s et~al.(2015)Erd\H{o}s, Ishakian, Bestavros, and
+  Terzi]{ErdosIBT15}
+D.~Erd\H{o}s, V.~Ishakian, A.~Bestavros, and E.~Terzi.
+\newblock A divide-and-conquer algorithm for betweenness centrality.
+\newblock SDM'15, 2015.
+
+\bibitem[Geisberger et~al.(2008)Geisberger, Sanders, and
+  Schultes]{GeisbergerSS08}
+R.~Geisberger, P.~Sanders, and D.~Schultes.
+\newblock Better approximation of betweenness centrality.
+\newblock ALENEX'08, 2008
+
+\bibitem[Kas et~al.(2013)Kas, Wachs, Carley, and Carley]{KasWCC13}
+M.~Kas, M.~Wachs, K.~M. Carley, and L.~R. Carley.
+\newblock Incremental algorithm for updating betweenness centrality in
+  dynamically growing networks.
+\newblock ASONAM'13, 2013.
+
+\bibitem[Kourtellis et~al.(2015)Kourtellis, Morales, and
+  Bonchi]{KourtellisMB15}
+N.~Kourtellis, G.~D.~F. Morales, and F.~Bonchi.
+\newblock Scalable online betweenness centrality in evolving graphs.
+\newblock \emph{{IEEE} Trans. Knowl. Data Eng.}, 27\penalty0 (9):\penalty0
+  2494--2506, 2015.
+
+\bibitem[Lee et~al.(2012)Lee, Lee, Park, Choi, and Chung]{LeeLPCC12}
+M.-J. Lee, J.~Lee, J.~Y. Park, R.~H. Choi, and C.-W. Chung.
+\newblock {QUBE}: A quick algorithm for updating betweenness centrality.
+\newblock WWW'12, 2012.
+
+\bibitem[Mavroforakis et~al.(2015{\natexlab{a}})Mavroforakis, Garcia-Lebron,
+  Koutis, and Terzi]{MavroforakisGLKT15}
+C.~Mavroforakis, R.~Garcia-Lebron, I.~Koutis, and E.~Terzi.
+\newblock Spanning edge centrality: Large-scale computation and applications.
+\newblock WWW'15, 2015.
+
+\bibitem[Mavroforakis et~al.(2015{\natexlab{b}})Mavroforakis, Mathioudakis, and
+  Gionis]{MavroforakisMG15}
+C.~Mavroforakis, M.~Mathioudakis, and A.~Gionis.
+\newblock Absorbing random-walk centrality: Theory and algorithms.
+\newblock CoRR/abs 1509.02533,  2015.
+
+\bibitem[Nasre et~al.(2014)Nasre, Pontecorvi, and Ramachandran]{NasrePR14}
+M.~Nasre, M.~Pontecorvi, and V.~Ramachandran.
+\newblock Betweenness centrality--incremental and faster.
+\newblock MFCS'14, 2014.
+
+\bibitem[Newman(2010)]{Newman10}
+M.~E.~J. Newman.
+\newblock \emph{Networks -- An Introduction}.
+\newblock Oxford University Press, 2010.
+
+\bibitem[Pontecorvi and Ramachandran(2015)]{PontecorviR15}
+M.~Pontecorvi and V.~Ramachandran.
+\newblock A faster algorithm for fully dynamic betweenness centrality.
+\newblock CoRR/abs 1506.05783, 2015.
+
+\bibitem[Riondato and Kornaropoulos(2015)]{RiondatoK15}
+M.~Riondato and E.~M. Kornaropoulos.
+\newblock Fast approximation of betweenness centrality through sampling.
+\newblock \emph{Data Mining Knowl.~Disc.}, (to appear), 2015.
+
+\bibitem[Sariy{\"u}ce et~al.(2013)Sariy{\"u}ce, Kaya, Saule, and
+  {\c{C}}ataly{\"u}rek]{SariyuceKSC13}
+A.~E. Sariy{\"u}ce, K.~Kaya, E.~Saule, and {\"U}.~V. {\c{C}}ataly{\"u}rek.
+\newblock Betweenness centrality on gpus and heterogeneous architectures.
+\newblock In \emph{Proceedings of the 6th Workshop on General Purpose Processor
+  Using Graphics Processing Units}, pages 76--85. ACM, 2013.
+
+\bibitem[Sariyuce et~al.(2013)Sariyuce, Kaya, Saule, and
+  Catalyurek]{SariyuceKSC13b}
+A.~E. Sariyuce, K.~Kaya, E.~Saule, and U.~V. Catalyurek.
+\newblock Incremental algorithms for closeness centrality.
+\newblock BigData'13, 2013.
+
+\bibitem[Sar{\i}y\"{u}ce et~al.(2013)Sar{\i}y\"{u}ce, Saule, Kaya, and
+  \c{C}ataly\"{u}rek]{SaryuceSKC13}
+A.~E. Sar{\i}y\"{u}ce, E.~Saule, K.~Kaya, and U.~V. \c{C}ataly\"{u}rek.
+\newblock Shattering and compressing networks for betweenness centrality.
+\newblock SDM'13, 2013.
+
+\bibitem[Yoshida(2014)]{Yoshida14}
+Y.~Yoshida.
+\newblock Almost linear-time algorithms for adaptive betweenness centrality
+  using hypergraph sketches.
+\newblock KDD'14, 2014.
+
+\end{thebibliography}
+\end{document}
