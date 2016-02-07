@@ -131,7 +131,7 @@ style="float:left;height:14ex;margin-right:0.5em;" />
 
 				<a name="bibliography"></a>
 				<h2>Bibliography</h2>
-				<p>A commented BibTeX bibliography with the most relevant references: <a href="centrality.bib"> (updated on <?php echo date ("M d Y", filemtime('centrality.bib')) ?>) </p>
+				<p>A commented BibTeX bibliography with the most relevant references: <a href="centrality.bib">centrality.bib</a> (updated on <?php echo date ("M d Y", filemtime('centrality.bib')) ?>) </p>
 				<a name="acknowledgements"></a>
 			</div> <!-- end of maincontent -->
 		</div> <!-- end of container_left_col -->
