@@ -7,8 +7,8 @@
 \usepackage{hyperref}
 \usepackage[numbers,square,sort&compress]{natbib}
 \renewcommand{\refname}{References}
-\renewcommand{\bibsection}{\subsection*{References}}
-\renewcommand*{\bibfont}{\raggedright}
+\renewcommand{\bibsection}{\subsection{References}}
+\renewcommand{\bibfont}{\raggedright}
 
 \permission{Copyright is held by the author/owner(s).}
 \conferenceinfo{WWW'16 Companion,}{April 11--15, 2016, Montr\'eal, Qu\'ebec, Canada.}
@@ -32,11 +32,11 @@ Francesco Bonchi\\
        \email{francescobonchi@acm.org}
 \end{tabular}\begin{tabular}[t]{p{1.3\auwidth}}\centering
 Gianmarco~De~Francisci~Morales\\
-       \affaddr{XXX}\\
-       \affaddr{XXX}\\
+       \affaddr{Qatar Computing Research Institute}\\
+       \affaddr{Doha, Qatar}\\
        \email{gdfm@acm.org}
 \alignauthor
-Matteo Riondato\titlenote{Main contact person}\\
+Matteo Riondato\titlenote{Main contact.}\\
        \affaddr{Two Sigma Investments}\\
        \affaddr{New York, NY, USA}\\
        \email{matteo@twosigma.com}
@@ -49,7 +49,116 @@ Matteo Riondato\titlenote{Main contact person}\\
 \end{abstract}
 
 \section{Introduction}
+Identifying ``important'' nodes or edges in a graph is a fundamental task
+in network analysis, with many applications. Several measures, known as
+\emph{centrality indices}, have been proposed over the years, each formalizing the
+concept of importance in a different way~\citep{Newman10}. Centrality measures
+rely on graph properties to quantify importance. For example, betweenness
+centrality considers the fraction of shortest paths going through a
+node or edge, while the closeness centrality of a node is the average sum of the inverse
+of the distance to every other node. Other centrality measures use eigenvectors,
+random walks, degrees, or more complex properties, and can usually be extended to sets of nodes.
 
+With the proliferation of huge networks with millions of nodes and billions of
+edges, the importance of having scalable algorithms for computing centrality
+indices has become more and more evident, and a number of contributions have been
+recently made, ranging from heuristics that perform extremely well in
+practice, to approximation algorithms with strong probabilistic guarantees,
+to scalable algorithms for the MapReduce platform. Moreover, the dynamic nature
+of many networks, i.e., the addition and removal of nodes and edges over
+time, dictates the need to keep the computed values of centrality up-to-date as
+the graph changes. These challenging problems have enjoyed enormous interest
+from the research community, resulting in several relevant approaches proposed recently
+to tackle them.
 
+Our tutorial presents, in a unified framework, some of the different measures of
+centrality, and discusses the algorithms to compute them, both in an exact and in
+an approximate way, both in-memory and in a distributed fashion for the
+MapReduce framework of computation. Our tutorial represents an effort to ease the
+comparison between different measures, the different quality guarantees offered
+by approximation algorithms, and the different trade-offs and scalability
+behaviors characterizing distributed algorithms. We believe this unity
+of presentation is beneficial both for newcomers and for experienced researchers
+in the field.
+
+\section{Outline}
+The tutorial is structured in three main technical parts, plus a concluding part
+where we discuss future research directions. All the three technical parts will
+contains both theory and experimental results.
+
+\begin{enumerate}
+	\item {\bf Introduction: definitions and exact algorithms}
+		\begin{enumerate}
+			\item The axioms of centrality~\citep{BoldiV14}
+			\item Definitions of centrality~\citep{Newman10}, including, but not
+				limited to: betweenness, closeness, degree, eigenvector,
+				harmonic, Katz, absorbing random-walk~\citep{MavroforakisMG15},
+				and spanning-edge centrality~\citep{MavroforakisGLKT15}.
+			\item Betweenness centrality: exact algorithm~\citep{Brandes01} and
+				heuristically-faster exact algorithms for betweenness
+				centrality~\citep{ErdosIBT15,SariyuceSKC13}.
+			\item Exact algorithms for betweenness centrality in a dynamic
+
+				graph~\citep{LeeLPCC12,NasrePR14,PontecorviR15}.
+			\item Exact algorithms for closeness centrality in a dynamic
+				graph~\citep{SariyuceKSC13b}.
+		\end{enumerate}
+	\item {\bf Approximation algorithms}
+		\begin{enumerate}
+			\item Sampling-based algorithm for closeness
+				centrality~\citep{EppsteinW04}.
+			\item Betweenness centrality: almost-linear-time approximation
+				algorithm~\citep{Yoshida14}, basic sampling-based
+				algorithm~\citep{BrandesP07}, refined
+				estimators~\citep{GeisbergerSS08}, VC-dimension bounds for
+				betweenness centrality~\citep{RiondatoK15}.
+			\item Approximation algorithms for betweenness centrality in dynamic
+				graphs~\citep{KasWCC13,BergaminiMS14,BergaminiM15,HayashiAY15}.
+		\end{enumerate}
+	\item {\bf Highly-scalable algorithms}
+		\begin{enumerate}
+			\item GPU-based algorithms~\citep{SariyuceKSC13}.
+			\item Exact parallel streaming algorithm for betweenness centrality in a
+				dynamic graph~\citep{KourtellisMB15}.
+		\end{enumerate}
+	\item {\bf Challenges and directions for future research}
+\end{enumerate}
+
+\section{Intended Audience}
+The tutorial is aimed at researchers interested in the theory and the
+applications of algorithms for graph mining and social network analysis.
+
+We do not require any specific existing knowledge. The tutorial is designed for
+an audience of computer scientists who have a general idea of the problems and
+challenges in graph analysis. We will present the material in such a way that
+any advanced undergraduate student would be able to productively follow our
+tutorial. %
+%and we will actively engage with the audience and adapt our pace and style to ensure
+%that every attendee can benefit from our tutorial.
+The tutorial starts from the basic definitions and progressively moves to more advanced
+algorithms, including sampling-based approximation algorithms and MapReduce
+algorithms, so that it will be of interest both to researchers new
+to the field and to a more experienced audience.
+
+\section{Duration: \textrm{Half-day}}
+
+\section{Previous editions of the tutorial}
+The tutorial was not previously offered. We did not find any tutorial covering
+similar topics in the programs of recent relevant conferences.
+
+\section{Support materials}
+We are developing a mini-website at
+\url{http://matteo.rionda.to/centrtutorial/}. It will contain the
+abstract of the tutorial, a detailed outline with short a description of
+each item of the outline, a full list of references with links to
+electronic editions, a list of software packages implementing the
+algorithms, and the slides used in the tutorial presentation. A preliminary version of the
+website will be available 15 days after the tutorial is accepted. A preliminary
+version of the slides will be available 30 days before the conference, or in any
+case by any deadline given to us by the conference organizers, and the final
+version will be available 15 days before the conference.
+
+\bibliographystyle{abbrvnat}
+\bibliography{centrality}
 
 \end{document}
