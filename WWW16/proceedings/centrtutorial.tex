@@ -47,21 +47,20 @@ Matteo Riondato\titlenote{Main contact.}\\
 
 \begin{abstract}
 Centrality measures allow to measure the relative importance of a node or an
-edge in a graph w.r.t.~other nodes or edges. Many measures of centrality have
+edge in a graph w.r.t.~other nodes or edges. Several measures of centrality have
 been developed in the literature to capture different aspects of the informal
-concept of importance, and algorithms for different measures have been proposed.
+concept of importance, and algorithms for these different measures have been proposed.
 In this tutorial, we survey the different definitions of centrality measures and
-the algorithms to compute them. We start from the most common measures (e.g.,
-closeness centrality, betweenness centrality) and move to more complex ones,
-glike spanning-edge centrality. In our presentation, we begin
+the algorithms to compute them. We start from the most common measures, such as
+closeness centrality and betweenness centrality, and move to more complex ones
+such as spanning-edge centrality. In our presentation, we begin
 from exact algorithms and then progress to approximation algorithms, including
 sampling-based ones, and to highly-scalable MapReduce algorithms for huge
 graphs, both for exact computation and for keeping the measures up-to-date on
-dynamic graphs where edges are inserted or deleted over time. Our goal is to
+dynamic graphs where edges are inserted or removed over time. Our goal is to
 show how advanced algorithmic techniques and scalable systems can be used to
-obtain efficient algorithms for an important graph mining tasks, and to
-encourage research in the area by highlighting open problems and possible
-directions.
+obtain efficient algorithms for an important graph mining task, and to
+encourage research in the area by highlighting open problems and possible directions.
 \end{abstract}
 
 \category{G.2.2}{Discrete Mathematics}{Graph Theory}[Graph algorithms]
@@ -71,55 +70,55 @@ directions.
 
 \section{Introduction}
 Identifying the ``important'' nodes or edges in a graph is a fundamental task
-in network analysis, with many applications. Many measures, known as
-\emph{centrality indices}, have been proposed over the years, formalizing the
-concept of importance in different ways~\citep{Newman10}. Centrality measures
-rely on graph properties to quantify importance. For example,betweenness
-centrality, one of the most commonly used centrality indices, counts the number
+in network analysis, with many applications, from economics and biology to security and sociology.
+Several measures, known as \emph{centrality indices}, have been proposed over the years, 
+formalizing the concept of importance in different ways~\citep{Newman10}. Centrality measures
+rely on graph properties to quantify importance. For example, betweenness
+centrality, one of the most commonly used centrality indices, counts the fraction
 of shortest paths going through a node, while the closeness centrality of a node
 is the average sum of the inverse of the distance to other nodes. Other
 centrality measures use eigenvectors, random walks, degrees, or more complex
-properties. The PageRank index of a node is also a centrality measure, and
-centrality measures for sets of nodes are also possible.
+properties. For instance, the PageRank index of a node is a centrality measure, and
+centrality measures for sets of nodes have also been defined.
 
 With the proliferation of huge networks with millions of nodes and billions of
 edges, the importance of having scalable algorithms for computing centrality
-indices has become more and more evident and a number of contributions have been
+indices has become more and more evident, and a number of contributions have been
 recently proposed, ranging from heuristics that perform extremely well in
 practice to approximation algorithms offering strong probabilistic guarantees,
 to scalable algorithms for the MapReduce platform. Moreover, the dynamic nature
-of many networks, i.e., the addition and removal of nodes and/or edges over
+of many networks, i.e., the addition and removal of nodes or edges over
 time, dictates the need to keep the computed values of centrality up-to-date as
 the graph changes. These challenging problems have enjoyed enormous interest
 from the research community, with many relevant contributions proposed recently
 to tackle them.
 
 Our tutorial presents, in a unified framework, some of the many measures of
-centrality and discuss the algorithms to compute them, both in an exact and in
-an approximate way, both in-memory and in a parallel/distributed fashion for the
-MapReduce framework of computation. This is done with an effort to ease the
+centrality, and discusses the algorithms to compute them, both in an exact and in
+an approximate way, both in-memory and in a distributed fashion in MapReduce.
+The goal of this unified presentation is to ease the
 comparison between different measures of centrality, the different quality
 guarantees offered by approximation algorithms, and the different trade-offs and
-scalability behaviors characterizing parallel/distributed algorithms. We believe
+scalability behaviors characterizing distributed algorithms. We believe
 this unity of presentation is beneficial both for newcomers and for
 experienced researchers in the field, who will be exposes to the material from a
-unified point of view.
+coherent point of view.
 
 The graph analyst can now choose among a huge number of centrality indices, from
 the well-established ones originally developed in sociology, to the ones more
-recently introduced to capture other aspects of ``importance''.  At the same
+recently introduced ones that capture other aspects of importance.  At the same
 time, the original algorithms that could handle the relatively small networks
 for classic social science experiments have been superseded by important
-algorithmic contributions that exploit modern computational frameworks and/or
+algorithmic contributions that exploit modern computational frameworks or
 obtain fast, high-quality approximations. It is our belief that the long history of
 centrality measures and the ever-increasing interest from computer
-scientists in analyzing larger and richer graphs, create the need for an
-all-around organization of both old and new materials, and is the desire to
-satisfy this need that inspired us to develop this tutorial.
+scientists in analyzing larger and richer graphs create the need for an
+all-around organization of both old and new materials, and the desire to
+satisfy this need inspired us to develop this tutorial.
 
 \section{Outline}
 The tutorial is structured in three main technical parts, plus a concluding part
-where we discuss future research directions. All the three technical parts will
+where we discuss future research directions. All three technical parts will
 contains both theory and experimental results.
 
 \paragraph{Part I: Definitions and Exact Algorithms}
@@ -136,7 +135,7 @@ by exploiting different properties of real world graphs.
 Exact computation of centrality measures becomes impractical on web-scale
 networks. Commonly, one of two alternative approaches is taken to speed up the
 computation: focus on obtaining an \emph{approximation} of the measure of
-interest or using \emph{parallel and/or distributed algorithms}. In the second
+interest or use \emph{parallel and distributed algorithms}. In the second
 part of our tutorial we explore the former approach, while in the third part we
 deal with the latter.
 
@@ -268,15 +267,7 @@ Applications and New Techniques" published by Chapman \& Hall/CRC Press.
 He presented a tutorial at ACM KDD'14.
 
 \smallskip
-\noindent{\bf Gianmarco De Francisci Morales} is a Visiting Scientist at Aalto
-University. Previously he worked as a Research Scientist at Yahoo Labs
-Barcelona, and as a Research Associate at ISTI-CNR in Pisa. His research focuses
-on scalable data mining, with an emphasis on Web mining and data-intensive
-scalable computing systems.
-%He is an active member of the open source community of the Apache Software Foundation, working on the Hadoop ecosystem, and a committer for the Apache Pig project.
-He is one of the lead developers of Apache SAMOA, an open-source platform for
-mining big data streams. He presented a tutorial on stream mining at IEEE
-BigData'14.
+\noindent{\bf Gianmarco De Francisci Morales} is a Scientist at QCRI. Previously he worked as a Visiting Scientist at Aalto University in Helsinki, as a Research Scientist at Yahoo Labs in Barcelona, and as a Research Associate at ISTI-CNR in Pisa. He received his Ph.D. in Computer Science and Engineering from the IMT Institute for Advanced Studies of Lucca in 2012. His research focuses on scalable data mining, with an emphasis on Web mining and data-intensive scalable computing systems. He is an active member of the open source community of the Apache Software Foundation, working on the Hadoop ecosystem, and a committer for the Apache Pig project. He is one of the lead developers of Apache SAMOA, an open-source platform for mining big data streams. He commonly serves on the PC of several major conferences in the area of data mining, including WSDM, KDD, CIKM, and WWW. He co-organizes the workshop series on Social News on the Web (SNOW), co-located with the WWW conference. He presented a tutorial on stream mining at IEEE BigData'14.
 
 \smallskip
 \noindent{\bf Matteo Riondato} is a Research Scientist in the Labs group at Two Sigma
