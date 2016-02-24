@@ -31,6 +31,7 @@
 
 \newcommand*\betw{\mathsf{b}}
 \newcommand*\tbetw{\tilde{\betw}}
+\newcommand*\allsp{\mathbb{S}}
 \newcommand*\Sam{{\cal S}}
 \newcommand*\range{\mathcal{R}}
 \newcommand*\expectation{\mathbb{E}}
@@ -55,5 +56,22 @@ Gianmarco De Francisci Morales\inst{2} \and Matteo Riondato\inst{3}}
 \begin{document}
 \begin{frame}
 	\titlepage
+\end{frame}
+
+\begin{frame}
+  \frametitle{Notation}
+  \begin{itemize}
+    \item Graph $G=(V,E)$. $|V|=n$, $|E|=m$.
+    \item All Shortest Paths (SPs) from node $s$ to node $t$: $\mathcal{S}_{st}$.
+    \item All shortest paths in the graph:
+      $\mathbb{S}_G=\cup_{s,t}\mathcal{S}_{st}$.
+    \item Number of SPs from $s$ to $t$: $\sigma_{st}=|\mathcal{S}_{st}|$.
+    \item Number of SPs from $s$ to $t$ that go through $w$: $\sigma_{st}(w)$.
+    \item Pair dependency of $(s,t)$ on $w$:
+      $\delta_{st}(w)=\sigma_{st}(w)/\sigma_{st}$.
+    \item Dependency of a node $s$ on another node $w$: $\delta_s(w)=\sum_{t\in
+      V}\delta_{st}(v)$.
+    \item \ldots
+  \end{itemize}
 \end{frame}
 \end{document}
