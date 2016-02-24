@@ -1,0 +1,59 @@
+\documentclass[aspectratio=169]{beamer}
+\mode<presentation>
+\usepackage{exscale}
+\usepackage[ruled]{algorithm2e} % must be loaded after natbib
+\usepackage{dsfont}
+\usepackage{mdwlist}
+\usepackage{amsmath}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{subfigure}
+
+\usetheme[height=0pt]{Rochester}
+%\useoutertheme[footline=empty]{miniframes}
+\useinnertheme{circles}
+\setbeamercolor{math text}{fg=red}
+\setbeamercolor{frametitle}{fg=blue}
+%\setbeamercolor{framesubtitle}{fg=blue}
+\setbeamertemplate{frametitle}
+{
+\begin{centering}
+\insertframetitle\par
+\insertframesubtitle\par
+\end{centering}
+}
+\beamertemplatenavigationsymbolsempty
+
+\newcommand{\purple   }{\color{purple}}
+\newcommand{\black  }{\color{black}}
+\newcommand{\green }{\color{green}}
+\newcommand{\red }{\color{red}}
+
+\newcommand*\betw{\mathsf{b}}
+\newcommand*\tbetw{\tilde{\betw}}
+\newcommand*\Sam{{\cal S}}
+\newcommand*\range{\mathcal{R}}
+\newcommand*\expectation{\mathbb{E}}
+\newcommand*\indicator{\mathds{1}}
+\newcommand*\family{{\cal F}}
+\newcommand*\domain{{\cal D}}
+
+\newtheorem{Claim}{Claim}
+
+\title{Centrality Measures on Big Graphs\\Exact, Approximated, and Distributed Algorithms}
+\author[Bonchi, De Francisci Morales, Riondato]{Francesco Bonchi\inst{1} \and
+Gianmarco De Francisci Morales\inst{2} \and Matteo Riondato\inst{3}}
+\date[WWW'16]{WWW'16 -- Montr\'eal, April 11--15, 2016}
+ \institute[ISI, QCRI, TwoSigma]{
+	\inst{1} ISI Foundation
+	\and
+	\inst{2} QCRI
+	\and
+  \inst{3} Two Sigma Investments
+}
+
+\begin{document}
+\begin{frame}
+	\titlepage
+\end{frame}
+\end{document}
