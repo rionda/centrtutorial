@@ -106,7 +106,7 @@ href="../papers/BonchiDeFrancisciMoralesRiondato-CentralityBigGraphsTutorial-WWW
 				<img src="bw.jpg" alt="Portrait of Gianmarco De Francisci Morales"
 				title="Gianmarco De Francisci Morales" style="float:left;height:14ex;margin-right:0.5em;" />
 				<p>Gianmarco De Francisci Morales is a Scientist at <a
-				href="http://www.qcri.org">QCRI</a>. Previously he worked as a Visiting
+				href="http://qcri.org.qa ">QCRI</a>. Previously he worked as a Visiting
 				Scientist at Aalto University in Helsinki, as a Research Scientist at
 				Yahoo Labs in Barcelona, and as a Research Associate at ISTI-CNR in
 				Pisa. He received his Ph.D. in Computer Science and Engineering from
