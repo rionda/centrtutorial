@@ -71,7 +71,7 @@ Date();a=s.createElement(o),
 				possible directions.</p>
 
 				<p>More details on the material we will cover are available in the <a
-href="../papers/BonchiDeFrancisciMoralesRiondato-CentralityBigGraphsTutorial-WWW.pdf">proposal</a>.</p>
+href="../papers/BonchiDeFrancisciMoralesRiondato-CentralityBigGraphsTutorial-WWW.pdf">4-pages outline</a>.</p>
 
 				<a name="slides"></a>
 				<h2>Slides</h2>
