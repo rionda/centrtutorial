@@ -105,15 +105,20 @@ href="../papers/BonchiDeFrancisciMoralesRiondato-CentralityBigGraphsTutorial-WWW
 				<h3><a href="http://www.gdfm.me">Gianmarco De Francisci Morales</a></h3>
 				<img src="bw.jpg" alt="Portrait of Gianmarco De Francisci Morales"
 				title="Gianmarco De Francisci Morales" style="float:left;height:14ex;margin-right:0.5em;" />
-				<p>Gianmarco is a Visiting Scientist at Aalto University. Previously he
-				worked as a Research Scientist at Yahoo Labs Barcelona, and as a
-				Research Associate at ISTI-CNR in Pisa. His research focuses on scalable data
-				mining, with an emphasis on Web mining and data-intensive scalable computing
-				systems. He is an active member of the open source community of the Apache
-				Software Foundation, working on the Hadoop ecosystem, and a committer for the
-				Apache Pig project. He is one of the lead developers of Apache SAMOA, an
-				open-source platform for mining big data streams. He presented a tutorial on
-				stream mining at IEEE BigData'14.</p>
+				<p>Gianmarco De Francisci Morales is a Scientist at <a
+				href="http://www.qcri.org">QCRI</a>. Previously he worked as a Visiting
+				Scientist at Aalto University in Helsinki, as a Research Scientist at
+				Yahoo Labs in Barcelona, and as a Research Associate at ISTI-CNR in
+				Pisa. He received his Ph.D. in Computer Science and Engineering from
+				the IMT Institute for Advanced Studies of Lucca in 2012. His research
+				focuses on scalable data mining, with an emphasis on Web mining and
+				data-intensive scalable computing systems. He is an active member of
+				the open source community of the Apache Software Foundation, working on
+				the Hadoop ecosystem, and a committer for the Apache Pig project. He is
+				one of the lead developers of Apache SAMOA, an open-source platform for
+				mining big data streams. He co-organizes the workshop series on Social
+				News on the Web (SNOW), co-located with the WWW conference. He
+				presented a tutorial on stream mining at IEEE BigData'14.</p>
 				<p><strong>Twitter:</strong> <a href="http://www.twitter.com/gdfm7">@gdfm7</a></p>
 
 				<h3><a href="http://matteo.rionda.to">Matteo Riondato</a></h3>
