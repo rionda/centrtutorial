@@ -84,13 +84,11 @@ href="../papers/BonchiDeFrancisciMoralesRiondato-CentralityBigGraphsTutorial-WWW
 				title="Francesco Bonchi" style="float:left;height:14ex;margin-right:0.5em;" />
 
 				<p>Francesco is Research Leader at the ISI Foundation, Turin, Italy,
-				where he leads the "Algorithmic Data Analytics" group. He is also Scientific
-				Director for Data Mining at Eurecat (Technological Center of Catalunya),
-				Barcelona. Before he was Director of Research at Yahoo Labs in Barcelona,
-				Spain, leading the Web Mining Research group. His recent research
-				interests include mining query-logs, social networks, and social media,
-				as well as the privacy issues related to mining these kinds of sensible
-				data.</p>
+				where he leads the "Algorithmic Data Analytics" group. Before he was
+				Director of Research at Yahoo Labs in Barcelona, Spain, leading the Web
+				Mining Research group. His recent research interests include mining
+				query-logs, social networks, and social media, as well as the privacy
+				issues related to mining these kinds of sensible data.</p>
 				<p>He will be PC Chair of the 16th IEEE International Conference on Data Mining
 				(ICDM 2016) to be held in Barcelona in December 2016. He is member of the ECML
 				PKDD Steering Committee, Associate Editor of the newly created IEEE
@@ -99,7 +97,7 @@ href="../papers/BonchiDeFrancisciMoralesRiondato-CentralityBigGraphsTutorial-WWW
 				Systems and Technology (TIST), Knowledge and Information Systems
 				(KAIS), and member of the Editorial Board of Data Mining and Knowledge Discovery (DMKD).
 				He earned his Ph.D. in computer science from the University of Pisa in
-				December 2003. He presented a tutorial at ACM KDD'14.</p>
+				December 2003.</p>
 				<p><strong>Twitter:</strong> <a href="http://www.twitter.com/FrancescoBonchi">@FrancescoBonchi</a></p>
 
 				<h3><a href="http://www.gdfm.me">Gianmarco De Francisci Morales</a></h3>
@@ -117,21 +115,20 @@ href="../papers/BonchiDeFrancisciMoralesRiondato-CentralityBigGraphsTutorial-WWW
 				the Hadoop ecosystem, and a committer for the Apache Pig project. He is
 				one of the lead developers of Apache SAMOA, an open-source platform for
 				mining big data streams. He co-organizes the workshop series on Social
-				News on the Web (SNOW), co-located with the WWW conference. He
-				presented a tutorial on stream mining at IEEE BigData'14.</p>
+				News on the Web (SNOW), co-located with the WWW conference.</p>
 				<p><strong>Twitter:</strong> <a href="http://www.twitter.com/gdfm7">@gdfm7</a></p>
 
 				<h3><a href="http://matteo.rionda.to">Matteo Riondato</a></h3>
 				<img src="../files/matteo_riondato.jpg" alt="Head shot of Matteo Riondato
 				by Andrea Podest&agrave;" title="Matteo Riondato"
-style="float:left;height:14ex;margin-right:0.5em;" />
+				style="float:left;height:14ex;margin-right:0.5em;" />
 				<p>Matteo is a Research Scientist in the Labs group at <a
-				href="http://www.twosigma.com">Two Sigma Investments</a>. Previously he was a postdoc at Stanford and at Brown. His
-				dissertation on sampling-based randomized algorithms for data and graph mining
-				received the Best Student Poster Award at SIAM SDM'14. His research focuses on
-				exploiting advanced theory to develop practical algorithms for time series
-				analysis, pattern mining, and social network analysis. He presented
-				tutorials at ACM KDD'15, ECML PKDD'15, and ACM CIKM'15.</p>
+				href="http://www.twosigma.com">Two Sigma Investments</a> and a Visiting
+				Assistant Professor at Brown University. His dissertation on
+				sampling-based randomized algorithms for data and graph mining received
+				the Best Student Poster Award at SIAM SDM'14. His research focuses on
+				exploiting advanced theory to develop practical algorithms for time
+				series analysis, pattern mining, and social network analysis.</p>
 				<p><strong>Twitter:</strong> <a href="http://www.twitter.com/teorionda">@teorionda</a></p>
 
 				<a name="bibliography"></a>
