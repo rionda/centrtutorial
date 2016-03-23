@@ -50,12 +50,22 @@
 \newcommand{\pred}{\ensuremath{P}\xspace}
 \newcommand{\sssp}{\ensuremath{\textsc{sssp}}\xspace}
 \renewcommand{\dag}{\ensuremath{\textsc{dag}}\xspace} % no need for daggers
+\newcommand{\spath}{\ensuremath{\mathcal{S}}\xspace}
+\newcommand{\allspath}{\ensuremath{\mathbb{S}\xspace}}
 
 \newtheorem{Claim}{Claim}
 
+%% slide number
+\addtobeamertemplate{navigation symbols}{}{%
+    \usebeamerfont{footline}%
+    \usebeamercolor[fg]{footline}%
+    \hspace{1em}%
+    \insertframenumber/\inserttotalframenumber
+}
+
 \title{Centrality Measures on Big Graphs\\Exact, Approximated, and Distributed Algorithms}
-\author[Bonchi, De Francisci Morales, Riondato]{Francesco Bonchi\inst{1} \and
-Gianmarco De Francisci Morales\inst{2} \and Matteo Riondato\inst{3}}
+\author[Bonchi, De-Francisci-Morales, Riondato]{Francesco Bonchi\inst{1} \and
+Gianmarco De-Francisci-Morales\inst{2} \and Matteo Riondato\inst{3}}
 \date[WWW'16]{WWW'16 -- Montr\'eal, April 11--15, 2016}
   \institute[ISI, Qatar Computing Research Institute, TwoSigma]{
   \inst{1} ISI Foundation
@@ -74,10 +84,10 @@ Gianmarco De Francisci Morales\inst{2} \and Matteo Riondato\inst{3}}
   \frametitle{Notation}
   \begin{itemize}
     \item Graph $G=(V,E)$. $|V|=n$, $|E|=m$.
-    \item All Shortest Paths (SPs) from node $s$ to node $t$: $\mathcal{S}_{st}$.
+    \item All Shortest Paths (SPs) from node $s$ to node $t$: $\spath_{st}$.
     \item All shortest paths in the graph:
-      $\mathbb{S}_G=\cup_{s,t}\mathcal{S}_{st}$.
-    \item Number of SPs from $s$ to $t$: $\paths_{st}=|\mathcal{S}_{st}|$.
+      $\allspath_G=\cup_{s,t}\spath_{st}$.
+    \item Number of SPs from $s$ to $t$: $\paths_{st}=|\spath_{st}|$.
     \item Number of SPs from $s$ to $t$ that go through $w$: $\paths_{st}(w)$.
     \item Pair dependency of $(s,t)$ on $w$:
       $\dep_{st}(w)=\paths_{st}(w)/\paths_{st}$.
@@ -85,6 +95,7 @@ Gianmarco De Francisci Morales\inst{2} \and Matteo Riondato\inst{3}}
       $\dep_s(w)=\sum_{t \in V}\dep_{st}(v)$.
     \item Predecessors of a node $w$ in a shortest path DAG from source $s$:
       $\pred_s(w)$
+    \item An edge $e$ is \emph{added} and \emph{removed} (addition and removal, no insertion, deletion)
     \item \ldots
   \end{itemize}
 \end{frame}

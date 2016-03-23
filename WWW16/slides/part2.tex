@@ -1,12 +1,22 @@
 % !TEX root =  centrtutorial.tex
+
 \begin{frame}
-  \frametitle{Betweenness Centrality ? Incremental and Faster}
+  \frametitle{Part 2}
+  \centering
+  \Huge Exact Incremental and \\ Fully Dynamic Algorithms
+\end{frame}
+
+
+%% BC - Incremental and Faster
+\begin{frame}
+  \frametitle{Betweenness Centrality -- Incremental and Faster}
   \centering
   \vfill
-  {\huge Meghana Nasre, Matteo Pontecorvi, Vijaya Ramachandran}
+  {\huge M. Nasre, M. Pontecorvi, V. Ramachandran}
   \vfill
   {\large MFCS '14: Mathematical Foundations of Computer Science}
 \end{frame}
+
 
 \begin{frame}
   \frametitle{Path Dependency}
@@ -28,8 +38,8 @@
     \centering
     \includegraphics[scale=1]{imgs/path-dependency}
   \end{figure}
-  
 \end{frame}
+
 
 \begin{frame}
   \frametitle{Main Result}
@@ -38,8 +48,8 @@
     \centering
     \includegraphics[width=\textwidth]{imgs/npr14-main-result}
   \end{figure}
-  
 \end{frame}
+
 
 \begin{frame}
   \frametitle{Lemmas}
@@ -48,8 +58,8 @@
     \centering
     \includegraphics[width=\textwidth]{imgs/npr14-lemmas}
   \end{figure}
-  
 \end{frame}
+
 
 \begin{frame}
   \frametitle{SSSP DAG Update}
@@ -58,8 +68,8 @@
     \centering
     \includegraphics[width=\textwidth]{imgs/npr14-algo3}
   \end{figure}
-  
 \end{frame}
+
 
 \begin{frame}
   \frametitle{Edge Update}
@@ -68,8 +78,8 @@
     \centering
     \includegraphics[width=\textwidth]{imgs/npr14-algo4}
   \end{figure}
-  
 \end{frame}
+
 
 \begin{frame}
   \frametitle{Space-Efficient Variant $O(n^2)$}
@@ -84,8 +94,8 @@
     \end{itemize}
     \item Space $O(m^* + n^2)$ to store $E^*$ and $n^2$ distances $\dist(s,t)$ and shortest paths $\paths_{st}$
   \end{itemize}
-  
 \end{frame}
+
 
 \begin{frame}
   \frametitle{Comparison}
@@ -94,8 +104,8 @@
     \centering
     \includegraphics[width=\textwidth]{imgs/npr14-comparison}
   \end{figure}
-  
 \end{frame}
+
 
 \begin{frame}
   \frametitle{Shortcomings}
@@ -106,5 +116,232 @@
     \item Non-trivial to parallelize (need to access pairs of \sssp \dag at a time)
     \item Does not solve main bottleneck of most algorithms: $O(n^2)$ memory
   \end{itemize}
-  
 \end{frame}
+
+
+%% QUBE
+\begin{frame}
+  \frametitle{QUBE: a Quick Algorithm for Updating BEtweenness centrality}
+  \centering
+  \vfill
+  {\huge M. Lee, J. Lee, J. Park, R. Choi, C. Chung}
+  \vfill
+  {\large WWW '12: International World Wide Web Conference}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Intuition}
+  
+  \begin{itemize}
+    \item No need to update all vertices when a new edge is added
+    \item Prune vertices whose \betw does not change
+    \item Large reduction in all-pairs shortest paths to be re-computed
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Minimum Cycle Basis}
+  
+  \begin{itemize}
+    \item $G=(V,E)$ undirected graph
+    \item \emph{Cycle} $C \subseteq E$ s.t. $\forall v \in V$, $v$ incident to even number of edges in $C$
+    \item Represented as edge incidence vector $\nu \in \{ 0,1 \}^{|E|}$, where $\nu(e) = 1 \iff e \in C$ 
+    \item \emph{Cycle Basis} = set of linearly independent cycles
+    \item \emph{Minimum Cycle Basis} = on weighted graph with non-negative weights $w_e$, cycle basis of minimum total weight $w(C) = \sum_{i} w(C_i)$ where $w(C_i) = \sum_{e \in C_v} w_e$
+  \end{itemize}  
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Minimum Cycle Basis Example}
+  \begin{itemize}
+    \item Three cycle basis sets: $\{C_1, C_2\} , \{C_1, C_3\} , \{C_2, C_3\}$
+    \item If all edges have same weight $w_e = 1$, $MCB = \{C_1, C_2\}$
+  \end{itemize}
+  \begin{figure}[H]
+    \centering
+    \includegraphics[scale=2]{imgs/qube-mcb}
+  \end{figure}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Minimum Union Cycle}
+  
+  \begin{itemize}
+    \item Given a MCB $C$ and minimum cycles $C_i \in C$
+    \item Let $V_{C_i}$ be the set of vertices induced by $C_i$
+    \item Recursively union two $V_{C_i}$ if they share at least one vertex
+    \item The final set of vertices is a \emph{Minimum Union Cycle} $MUC$
+  \end{itemize}
+  
+  \begin{itemize}
+    \item $MUC$s are disjoint sets of vertices
+    \item $MUC(v)$ = the $MUC$ which contains vertex $v$
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Connection Vertex}
+  
+  \begin{itemize}
+    \item \emph{Articulation Vertex} = vertex $v$ whose deletion makes the graph disconnected
+    \item Biconnected graph = graph with no articulation vertex
+    \item Vertex $v$ is an articulation vertex $\iff$ v belongs to two biconnected components
+  \end{itemize} 
+  
+  \begin{itemize}
+    \item \emph{Connection Vertex} = vertex $v$ that
+    \begin{itemize}
+      \item is an articulation vertex
+      \item has an edge to vertex $w \not\in MUC(v)$
+    \end{itemize} 
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Connection Vertex Example}
+  
+  \begin{columns}[onlytextwidth]
+  
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item If $(v_3, v_4)$ is added, $MUC(v_3) = \{ v_1, v_2, v_3, v_4 \}$
+        \item $v_1, v_2, v_3$ are connection vertices of $MUC(v_3)$
+        \item Let $G_i$ be the disconnected subgraph generated by removing $v_i$
+      \end{itemize}
+    \end{column}
+    
+    \begin{column}{0.5\textwidth}
+      \begin{figure}[t]
+        \centering
+        \includegraphics[scale=1.15]{imgs/qube-biconnected}
+      \end{figure}
+    \end{column}
+    
+  \end{columns}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Finding MUCs}
+  
+  \begin{itemize}
+    \item Finding an $MCB$ is well studied
+    \item Kavitha, Mehlhorn, Michail, Paluch. ``A faster algorithm for minimum cycle basis of graphs''. ICALP 2004
+    \item Finding $MUC$ from $MCB$ relatively straightforward (just union sets of vertices)
+    \item Also find connection vertices for each $MUC$
+    \item All done as a preprocessing step
+    \item Need to be updated at runtime
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Updating MUCs -- Addition}
+  
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/qube-addition}
+  \end{figure}
+    
+  \begin{itemize}
+    \item Adding $a$ does not affect the $MUC$ (endpoints in the same $MUC$)
+    \item Adding $b$ creates a new $MUC$ (endpoints do not belong to a $MUC$)
+    \item Adding $c$ merges two $MUC$s (merge $MUC$s of vertices on the \spath between endpoints)
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Updating MUCs -- Removal}
+  
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/qube-removal}
+  \end{figure}
+  
+  \begin{itemize}
+    \item Removing $a$ destroys the $MUC$ (cycle is removed $\rightarrow$ no biconnected component)
+    \item Removing $b$ does not affect the $MUC$ ($MUC$ is still biconnected)
+    \item Removing $c$ splits the $MUC$ in two (single vertex appears in all \spath between endpoints)
+  \end{itemize}    
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Betweenness Centrality Dependency}
+  
+  \begin{itemize}
+    \item Only vertexes inside the $MUC$s of the updated endpoints need to be updated
+    \item However, recomputing all centralities for the $MUC$ still requires new shortest paths to the rest of the graph
+      \begin{itemize}
+        \item Shortest paths to vertices outside the $MUC$
+        \item Shortest paths that pass through the $MUC$
+      \end{itemize}
+  \end{itemize}
+  
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/qube-btwmuc}
+  \end{figure}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Betweenness Centrality outside the MUC}
+  
+  \begin{itemize}
+    \item Let $s \in V_{G_j}$, $t \in MUC$,
+    \item Let $c \in MUC$ be a connection vertex to subgraph $G_j$
+    \item Each vertex in $\spath_{ct}$ is also in $\spath_{st}$
+    \item Therefore, betweenness centrality due to vertices outside the $MUC$:    
+  \end{itemize}
+  
+  \begin{align*}
+    \large
+    \betw_{o}(v) = \begin{cases}
+      \frac{|V_{G_j}|}{\paths_{st}}		& \text{ if } v \in\{ \spath_{ct} \setminus t \} \\
+      0 						& \text{ otherwise }
+    \end{cases}
+  \end{align*}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Betweenness Centrality trough the MUC}
+  
+  \begin{itemize}
+    \item Let $s \in V_{G_j}$, $t \in V_{G_k}$,
+    \item Let $c_j \in MUC$ be a connection vertex to subgraph $G_j$
+    \item Let $c_k \in MUC$ be a connection vertex to subgraph $G_k$
+    \item Each vertex in $\spath_{c_j c_k}$ is also in $\spath_{st}$
+    \item Therefore, betweenness centrality due to paths through the $MUC$:    
+  \end{itemize}
+
+  \begin{align*}
+    \betw_{x}(v) = \begin{cases}
+      \frac{ |V_{G_j}| |V_{G_k}| }{ \paths_{st} }		& \text{ if } v \in \spath_{c_j c_k} \\
+      0 						& \text{ otherwise }
+    \end{cases}
+  \end{align*}
+  
+  More caveats apply for subgraphs that are disconnected, as every path that connects vertices in different connected component passes through $v$
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Updating Betweenness Centrality}
+  
+  {\huge
+  \begin{align*}
+    \betw(v) = \betw_{MUC}(v) + \sum_{G_j \subset G} \betw_{o}(v) + \sum_{G_j, G_k \subset G} \betw_{x}(v)
+  \end{align*}
+  }
+\end{frame}
+
+
