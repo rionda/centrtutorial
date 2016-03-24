@@ -2,6 +2,7 @@
 \mode<presentation>
 \usepackage{dsfont}
 \usepackage{exscale}
+\usepackage[square,numbers]{natbib}     % better references
 \usepackage[ruled]{algorithm2e} % must be loaded after natbib
 \usepackage{dsfont}
 \usepackage{mdwlist}
@@ -10,6 +11,7 @@
 \usepackage{booktabs}
 \usepackage{subfigure}
 \usepackage{xspace}
+\usepackage{pifont} % ding chars
 
 \usetheme[height=0pt]{Rochester}
 %\useoutertheme[footline=empty]{miniframes}
@@ -32,6 +34,9 @@
 \newcommand{\black}{\color{black}}
 \newcommand{\green}{\color{green}}
 \newcommand{\red}{\color{red}}
+
+\newcommand{\cmark}{\text{\ding{51}}}%
+\newcommand{\xmark}{\text{\ding{55}}}%
 
 \newcommand*{\allsp}{\ensuremath{\mathbb{S}}\xspace}
 \newcommand*{\Sam}{{\cal S}\xspace}
@@ -100,6 +105,32 @@ Gianmarco De-Francisci-Morales\inst{2} \and Matteo Riondato\inst{3}}
     \item An edge $e$ is \emph{added} and \emph{removed} (addition and removal, no insertion, deletion)
     \item \ldots
   \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Summary}
+  
+  \begin{table}[t!]
+    \vspace{-3mm}
+    \caption{Comparison with previous studies:  vertex ($C_V$) and edge centrality  ($C_E$), edge addition (+) and removal (-), parallel and streaming computation ($\|$), size of the largest graph used in the experiments ($|V|$ and $|E|$).
+    Note that \citet{NasrePR14} have smaller time complexity than Brandes' and other algorithms.}
+    \centering
+    \small
+    \tabcolsep=0.06cm
+    \begin{tabular}{ccccccccrr}
+    \toprule
+    Method							& Year 	&	Space				&	$C_V$	&	$C_E$	&	$+$	&	$-$	&	$\|$	&	$|V|$ & $|E|$	\\
+    \midrule
+    \citet{LeeLPCC12} 					& 2012	&	$\mathcal{O}(n^2$+$m)$	&	$\cmark$	&	$\xmark$	&	$\cmark$	&	$\cmark$	&	$\xmark$		&	12k	&	65k 		\\
+    \citet{GreenMB12}		& 2012 	&	$\mathcal{O}(n^2$+$nm)$	&	$\cmark$	&	$\xmark$	&	$\cmark$	&	$\xmark$	&	$\xmark$		&	23k	&	94k		\\
+    \citet{KasWCC13}				& 2013	&	$\mathcal{O}(n^2$+$nm)$	&	$\cmark$	&	$\xmark$	&	$\cmark$	&	$\xmark$	&	$\xmark$		&	8k	&	19k		\\
+    %\citet{mclaughlin14gpu-betweenness}	& 2014	&	$\mathcal{O}(n^2)$		&	$\cmark$	&	$\xmark$	&	$\cmark$	&	$\xmark$	&	$\cmark$		&	1M	&	3.1M		\\
+    \citet{NasrePR14}				& 2014	&	$\mathcal{O}(n^2)$	&	$\cmark$	&	$\xmark$	&	$\cmark$	&	$\xmark$	&	$\xmark$		&	-	&	-		\\
+    \citet{KourtellisMB15}							& 2014	&	$\mathcal{O}(n^2)$		&	$\cmark$	&	$\cmark$	&	$\cmark$	&	$\cmark$	&	$\cmark$		&	2.2M	&	5.7M		\\
+    \bottomrule
+    \end{tabular}
+    \label{tab:rel-work}
+  \end{table}
 \end{frame}
 
 \begin{frame}
@@ -459,5 +490,8 @@ Gianmarco De-Francisci-Morales\inst{2} \and Matteo Riondato\inst{3}}
 \end{frame}
 
 \input{part2}
+
+\bibliographystyle{abbrvnat}
+\bibliography{../proceedings/centrality.bib}
 
 \end{document}
