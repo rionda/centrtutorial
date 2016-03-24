@@ -345,3 +345,88 @@
 \end{frame}
 
 
+\begin{frame}
+  \frametitle{Updating MUCs -- Removal}
+  
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/qube-removal}
+  \end{figure}
+\end{frame}
+  
+
+\begin{frame}
+  \frametitle{QUBE algorithm}
+
+      \begin{figure}[t]
+        \centering
+        \includegraphics[width=\textwidth, height=\textheight, keepaspectratio]{imgs/qube-algorithm1}
+      \end{figure}
+
+%  \begin{columns}[onlytextwidth]
+%    \begin{column}{0.5\textwidth}
+%      \begin{figure}[t]
+%        \centering
+%        \includegraphics[width=\textwidth, height=\textheight, keepaspectratio]{imgs/qube-algorithm1}
+%      \end{figure}
+%    \end{column}
+    
+%    \begin{column}{0.5\textwidth}
+%      \begin{figure}[t]
+%        \centering
+%        \includegraphics[width=\textwidth, height=\textheight, keepaspectratio]{imgs/qube-algorithm2}
+%      \end{figure}
+%    \end{column}
+%  \end{columns}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{QUBE algorithm}
+
+      \begin{figure}[t]
+        \centering
+        \includegraphics[width=\textwidth, height=\textheight, keepaspectratio]{imgs/qube-algorithm2}
+      \end{figure}
+      
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{QUBE + Brandes}
+  
+  \begin{itemize}
+    \item QUBE is a pruning rule that reduces the search space for betweenness recomputation
+    \item Can be paired with any existing betweenness algorithm to compute $\betw_{MUC}$
+    \item In the experiments, Brandes' is used
+    \item Quantities computed by Brandes' (e.g., \paths) reused by QUBE for $\betw_o$ and $\betw_x$
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Results}
+
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.7\textheight, keepaspectratio]{imgs/qube-results1}
+    \caption{Update time as a function of the percentage of vertices of the graph in the updated $MUC$ for synthetic Erd\"{o}s-R\'{e}nyi graphs ($|V| = 5000$)}
+  \end{figure}
+    
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Conclusions}
+
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/qube-results2}
+  \end{figure}
+  
+  \begin{itemize}
+    \item Improvement depends highly on structure of the graph (bi-connectedness)
+    \item From 2 orders of magnitude (best) to 2 times (worst) faster than Brandes'
+  \end{itemize}
+    
+\end{frame}
