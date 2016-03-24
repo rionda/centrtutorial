@@ -3,11 +3,11 @@
 \begin{frame}
   \frametitle{Part 2}
   \centering
-  \Huge Exact Incremental and \\ Fully Dynamic Algorithms
+  \Huge Exact Incremental Algorithms
 \end{frame}
 
 
-%% BC - Incremental and Faster
+%% Nasre et al.
 \begin{frame}
   \frametitle{Betweenness Centrality -- Incremental and Faster}
   \centering
@@ -119,6 +119,17 @@
 \end{frame}
 
 
+%% Pontecorvi et al.
+\begin{frame}
+  \frametitle{A Faster Algorithm for Fully Dynamic Betweenness Centrality}
+  \centering
+  \vfill
+  {\huge M. Pontecorvi, V. Ramachandran}
+  \vfill
+  {\large arXiv:1506.05783}
+\end{frame}
+
+
 %% QUBE
 \begin{frame}
   \frametitle{QUBE: a Quick Algorithm for Updating BEtweenness centrality}
@@ -128,7 +139,6 @@
   \vfill
   {\large WWW '12: International World Wide Web Conference}
 \end{frame}
-
 
 \begin{frame}
   \frametitle{Intuition}
@@ -430,3 +440,49 @@
   \end{itemize}
     
 \end{frame}
+
+
+%% Kas et al.
+\begin{frame}
+  \frametitle{Incremental Algorithm for Updating Betweenness Centrality in Dynamically Growing Networks}
+  \centering
+  \vfill
+  {\huge M. Kas, M. Wachs, K. M. Carley, L. R. Carley}
+  \vfill
+  {\large ASONAM '13: International Conference on Advances \\in Social Networks analysis and Mining}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Intuition}
+  
+  \begin{itemize}
+    \item Extend an existing dynamic all-pairs shortest path algorithm to betweenness
+    \item G. Ramalingam and T. Reps, ``\emph{On the Computational Complexity of Incremental Algorithms},'' CS, Univ. of Wisconsin at Madison, Tech. Report 1991
+    \item Relevant quantities: number of shortest paths \paths, distances \dist, predecessors \pred
+  \end{itemize}
+    
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Edge update}
+  
+  \begin{itemize}
+    \item Compute new shortest paths from updated endpoints
+    \item If a new strictly smaller shortest path to any node is found, update \dist
+  \end{itemize}
+    
+\end{frame}
+
+
+%% Green et al.
+\begin{frame}
+  \frametitle{A Fast Algorithm for Streaming Betweenness Centrality}
+  \centering
+  \vfill
+  {\huge O. Green, R. McColl, D. A. Bader}
+  \vfill
+  {\large SocialCom '12: International Conference on Social Computing}
+\end{frame}
+
