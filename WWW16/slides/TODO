@@ -2,3 +2,12 @@ CentrTutorial
 Francesco: 1.a e 1.b (introduzione), e 4 (conclusions)
 Matteo: 1.c (exact algorithms on static graphs) 2 (approximation algorithms)
 Gianmarco: 1.d e 1.e exact algorithms on dynamic graphs), 3 (scalable algorithms)
+	1
+	QUBE: A quick algorithm for updating betweenness centrality
+	Incremental algorithm for updating betweenness centrality in dynamically growing networks
+	Betweenness centrality–incremental and faster
+	A faster algorithm for fully dynamic betweenness centrality
+	Incremental algorithms for closeness centrality
+	3
+	Betweenness centrality on GPUs and heterogeneous architectures
+	Scalable online betweenness centrality in evolving graphs
