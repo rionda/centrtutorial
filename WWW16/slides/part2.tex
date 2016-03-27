@@ -551,3 +551,155 @@
   {\large SocialCom '12: International Conference on Social Computing}
 \end{frame}
 
+\begin{frame}
+  \frametitle{Intuition}
+
+  \begin{itemize}
+    \item Make Brandes' algorithm incremental
+    \item Keep additional data structures to avoid recomputing partial results
+    \begin{itemize}
+      \item Rooted \spdag for each source $s \in V$
+    \end{itemize}
+    \item 
+  \end{itemize}
+    
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Algorithm \& data structures}
+  \begin{columns}[onlytextwidth]
+
+    \begin{column}{0.35\textwidth}
+      \begin{itemize}
+        \item One \spdag (aka BFS dag) for each source $s \in V$, which contains for each other vertex $v \in V$:
+        \begin{itemize}
+          \item Distance \dist, paths \paths, dependencies \dep, predecessors \pred
+          \item Additional per-level queues for exploration
+        \end{itemize}
+        \item On addition of edge $u,v$ 3 cases:
+        \begin{itemize}
+          \item $|d_{su} - d_{sv}| = 0$ same~level
+          \item $|d_{su} - d_{sv}| = 1$ adjacent~level
+          \item $|d_{su} - d_{sv}| > 1$ non-adjacent~level
+        \end{itemize}
+      \end{itemize}
+    \end{column}
+    
+    \begin{column}{0.65\textwidth}
+      \begin{figure}[t]
+        \centering
+%        \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/green-algo}
+        \includegraphics[width=0.5\textwidth, height=0.8\textheight, keepaspectratio, valign=t]{imgs/green-algo1}
+        \includegraphics[width=0.6\textwidth, height=0.8\textheight, keepaspectratio, valign=t]{imgs/green-algo2}
+      \end{figure}
+    \end{column}
+  \end{columns}
+  
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Same level addition}
+  \begin{columns}[onlytextwidth]
+  
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item $|d_{su} - d_{sv}| = 0$
+        \item Edge creates no new shortest paths
+        \item No change to betweenness due to this source
+      \end{itemize}
+    \end{column}
+    
+    \begin{column}{0.5\textwidth}
+      \begin{figure}[t]
+        \centering
+        \includegraphics[width=\textwidth, height=\textheight, keepaspectratio]{imgs/green-0lvl-compressed}
+      \end{figure}
+    \end{column}
+  \end{columns}
+  
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Adjacent level addition}
+  \begin{columns}[onlytextwidth]
+  
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item $|d_{su} - d_{sv}| = 1$
+        \item Edge creates new shortest paths
+        \item \spdag unchanged
+        \item Changes in \paths confined to sub-dag rooted in $v$
+        \item Changes in \dep spread above 
+      \end{itemize}
+    \end{column}
+    
+    \begin{column}{0.5\textwidth}
+      \begin{figure}[t]
+        \centering
+        \includegraphics[width=\textwidth, height=\textheight, keepaspectratio]{imgs/green-1lvl-compressed}
+      \end{figure}
+    \end{column}
+  \end{columns}
+    
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Non-adjacent level addition}
+  
+  \begin{columns}[onlytextwidth]
+  
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item $|d_{su} - d_{sv}| > 1$
+        \item Edge creates new shortest paths
+        \item Changes to \spdag (new distances)
+      \end{itemize}
+    \end{column}
+    
+    \begin{column}{0.5\textwidth}
+      \begin{figure}[t]
+        \centering
+        \includegraphics<1>[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/green-2lvl-before-compressed}
+          \transdissolve<2>
+          \transduration{2}
+        \includegraphics<2>[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/green-2lvl-after-compressed}
+      \end{figure}
+    \end{column}
+  \end{columns}
+    
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Complexity}
+
+  \begin{itemize}
+    \item Time
+    \item Space
+  \end{itemize}
+    
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Results}
+
+  \begin{itemize}
+    \item 
+  \end{itemize}
+    
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Conclusions}
+
+  \begin{itemize}
+    \item 
+  \end{itemize}
+    
+\end{frame}
