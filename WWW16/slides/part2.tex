@@ -307,8 +307,8 @@
   
   \begin{itemize}
     \item Let $s \in V_{G_j}$, $t \in MUC$,
-    \item Let $c \in MUC$ be a connection vertex to subgraph $G_j$
-    \item Each vertex in $\spath_{ct}$ is also in $\spath_{st}$
+    \item Let $j \in MUC$ be a connection vertex to subgraph $G_j$
+    \item Each vertex in $\spath_{jt}$ is also in $\spath_{st}$
     \item Therefore, betweenness centrality due to vertices outside the $MUC$:    
   \end{itemize}
   
@@ -327,15 +327,15 @@
   
   \begin{itemize}
     \item Let $s \in V_{G_j}$, $t \in V_{G_k}$,
-    \item Let $c_j \in MUC$ be a connection vertex to subgraph $G_j$
-    \item Let $c_k \in MUC$ be a connection vertex to subgraph $G_k$
-    \item Each vertex in $\spath_{c_j c_k}$ is also in $\spath_{st}$
+    \item Let $j \in MUC$ be a connection vertex to subgraph $G_j$
+    \item Let $k \in MUC$ be a connection vertex to subgraph $G_k$
+    \item Each vertex in $\spath_{jk}$ is also in $\spath_{st}$
     \item Therefore, betweenness centrality due to paths through the $MUC$:    
   \end{itemize}
 
   \begin{align*}
     \betw_{x}(v) = \begin{cases}
-      \frac{ |V_{G_j}| |V_{G_k}| }{ \paths_{st} }		& \text{ if } v \in \spath_{c_j c_k} \\
+      \frac{ |V_{G_j}| |V_{G_k}| }{ \paths_{st} }		& \text{ if } v \in \spath_{jk} \\
       0 						& \text{ otherwise }
     \end{cases}
   \end{align*}
@@ -460,6 +460,7 @@
     \item Extend an existing dynamic all-pairs shortest path algorithm to betweenness
     \item G. Ramalingam and T. Reps, ``\emph{On the Computational Complexity of Incremental Algorithms},'' CS, Univ. of Wisconsin at Madison, Tech. Report 1991
     \item Relevant quantities: number of shortest paths \paths, distances \dist, predecessors \pred
+    \item Keep a copy of the old quantities while updating
   \end{itemize}
     
 \end{frame}
@@ -469,8 +470,72 @@
   \frametitle{Edge update}
   
   \begin{itemize}
-    \item Compute new shortest paths from updated endpoints
-    \item If a new strictly smaller shortest path to any node is found, update \dist
+    \item Compute new shortest paths from updated endpoints $(v,w)$
+    \item If a new shortest path of the same length is found, updated number of paths as
+  \end{itemize}
+  {\Large
+  \begin{align*}
+    \paths_{st} = \paths_{st} + \paths_{sv} \times \paths_{wt}
+  \end{align*}
+  }
+    \begin{itemize}
+    \item If a new \emph{shorter} shortest path to any node is found, update \dist, clear \paths
+    \item Betweenness decreased if new shortest path found
+    \item Edge betweenness updates backtrack via DFS over $\pred_s(t)$
+  \end{itemize}
+    {\Large
+  \begin{align*}
+    \betw(u) = \betw(u) - \paths_{su} \times \paths_{ut} / \paths_{st}
+  \end{align*}
+  }
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Edge update}
+  
+  \begin{itemize}
+    \item Complex bookkeeping: need to consider all affected vertices which have new alternative shortest paths of equal length (not covered in the original algorithm)
+    \item Amend \pred during update propagation $\rightarrow$ concurrent changes to the \spath\dag
+    \item Need to track now-unreachable nodes separately
+  \end{itemize}
+  
+  \begin{itemize}
+    \item After having fixed \dist, \paths, \betw, increase \betw due to new paths
+    \item Update needed $\forall s,t \in V$ affected by changes (tracked from previous phase)
+    \item Betweenness increase analogous to above decrease
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Results}
+
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.7\textheight, keepaspectratio]{imgs/kas-results1}
+    \caption{Speedup over Brandes' on real-world graphs}
+  \end{figure}
+
+  \begin{itemize}
+    \item Speedup depends on topological characteristics (e.g., diameter, clust. coeff.)
+  \end{itemize}
+    
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Comparison with QUBE}
+
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.7\textheight, keepaspectratio]{imgs/kas-results2}
+%    \caption{}
+  \end{figure}
+
+  \begin{itemize}
+    \item Datasets from the QUBE paper
+    \item About 1 order of magnitude faster than QUBE
   \end{itemize}
     
 \end{frame}
