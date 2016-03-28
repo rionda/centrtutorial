@@ -420,7 +420,7 @@
   \begin{figure}[t]
     \centering
     \includegraphics[width=\textwidth, height=0.7\textheight, keepaspectratio]{imgs/qube-results1}
-    \caption{Update time as a function of the percentage of vertices of the graph in the updated $MUC$ for synthetic Erd\"{o}s-R\'{e}nyi graphs ($|V| = 5000$)}
+    \caption{Update time as a function of the percentage of vertices of the graph in the updated $MUC$ for synthetic Erd\"{o}s-R\'{e}nyi graphs ($n = 5000$)}
   \end{figure}
     
 \end{frame}
@@ -556,46 +556,37 @@
 
   \begin{itemize}
     \item Make Brandes' algorithm incremental
+    \item Support only edge addition (on unweighted graphs)
     \item Keep additional data structures to avoid recomputing partial results
     \begin{itemize}
       \item Rooted \spdag for each source $s \in V$
+      \item Depth in the tree for $t$ = distance of $t$ from $s$
     \end{itemize}
-    \item 
+    \item Re-run parts of modified Brandes' algorithm on edge update
   \end{itemize}
     
 \end{frame}
 
 
 \begin{frame}
-  \frametitle{Algorithm \& data structures}
-  \begin{columns}[onlytextwidth]
+  \frametitle{Data structures}
 
-    \begin{column}{0.35\textwidth}
-      \begin{itemize}
-        \item One \spdag (aka BFS dag) for each source $s \in V$, which contains for each other vertex $v \in V$:
-        \begin{itemize}
-          \item Distance \dist, paths \paths, dependencies \dep, predecessors \pred
-          \item Additional per-level queues for exploration
-        \end{itemize}
-        \item On addition of edge $u,v$ 3 cases:
-        \begin{itemize}
-          \item $|d_{su} - d_{sv}| = 0$ same~level
-          \item $|d_{su} - d_{sv}| = 1$ adjacent~level
-          \item $|d_{su} - d_{sv}| > 1$ non-adjacent~level
-        \end{itemize}
-      \end{itemize}
-    \end{column}
-    
-    \begin{column}{0.65\textwidth}
-      \begin{figure}[t]
-        \centering
-%        \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/green-algo}
-        \includegraphics[width=0.5\textwidth, height=0.8\textheight, keepaspectratio, valign=t]{imgs/green-algo1}
-        \includegraphics[width=0.6\textwidth, height=0.8\textheight, keepaspectratio, valign=t]{imgs/green-algo2}
-      \end{figure}
-    \end{column}
-  \end{columns}
-  
+  \begin{itemize}
+    \item One \spdag (aka BFS dag) for each source $s \in V$, which contains for each other vertex $v \in V$:
+    \begin{itemize}
+      \item Distance \dist, paths \paths, dependencies \dep, predecessors \pred
+      \item Additional per-level queues for exploration
+    \end{itemize}
+  \end{itemize}
+  \begin{itemize}
+    \item On addition of edge $u,v$ 3 cases:
+    \begin{itemize}
+      \item $|d_{su} - d_{sv}| = 0$ same~level
+      \item $|d_{su} - d_{sv}| = 1$ adjacent~level
+      \item $|d_{su} - d_{sv}| > 1$ non-adjacent~level
+    \end{itemize}
+  \end{itemize}
+      
 \end{frame}
 
 
@@ -607,7 +598,7 @@
       \begin{itemize}
         \item $|d_{su} - d_{sv}| = 0$
         \item Edge creates no new shortest paths
-        \item No change to betweenness due to this source
+        \item No change to betweenness \\ due to this source
       \end{itemize}
     \end{column}
     
@@ -629,10 +620,12 @@
     \begin{column}{0.5\textwidth}
       \begin{itemize}
         \item $|d_{su} - d_{sv}| = 1$
+        \item Let $u_{high} = u ,\, u_{low} = v$
         \item Edge creates new shortest paths
         \item \spdag unchanged
-        \item Changes in \paths confined to sub-dag rooted in $v$
-        \item Changes in \dep spread above 
+        \item Changes in \paths confined to sub-dag rooted in $u_{low}$
+        \item Changes in \dep also spread above to decrease old dependency and account for new dependency
+        \item Example: $w$ and predecessors have now only $\sfrac{1}{2}$ of dependency on sub-dag rooted in $u_{low}$
       \end{itemize}
     \end{column}
     
@@ -648,6 +641,40 @@
 
 
 \begin{frame}
+  \frametitle{Algorithm}
+  \begin{columns}[onlytextwidth]
+  
+    \begin{column}{0.3\textwidth}
+      \begin{itemize}
+        \item During exploration:
+        \begin{itemize}
+          \item Fix \paths
+          \item Mark visited vertices
+          \item Enqueue for further processing
+        \end{itemize}
+      \end{itemize}
+      \begin{itemize}
+        \item During backtracking:%
+        \begin{itemize}
+          \item Fix \dep and \betw
+          \item Recurse up the whole \spdag
+        \end{itemize}
+      \end{itemize}
+    \end{column}
+    
+    \begin{column}{0.7\textwidth}
+      \begin{figure}[t]
+        \centering
+%        \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/green-algo}
+        \includegraphics[width=0.45\textwidth, height=0.8\textheight, keepaspectratio, valign=t]{imgs/green-algo1}
+        \includegraphics[width=0.6\textwidth, height=0.8\textheight, keepaspectratio, valign=t]{imgs/green-algo2}
+      \end{figure}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+\begin{frame}
   \frametitle{Non-adjacent level addition}
   
   \begin{columns}[onlytextwidth]
@@ -657,6 +684,7 @@
         \item $|d_{su} - d_{sv}| > 1$
         \item Edge creates new shortest paths
         \item Changes to \spdag (new distances)
+        \item Algorithm only sketched \\ (most details missing)
       \end{itemize}
     \end{column}
     
@@ -678,8 +706,12 @@
   \frametitle{Complexity}
 
   \begin{itemize}
-    \item Time
-    \item Space
+    \item Time: $O(n^2 + nm)$ $\leftarrow$ same as Brandes'
+    \item In practice, algorithm is much faster
+  \end{itemize}
+  \begin{itemize}
+    \item Space: $O(n^2 + nm)$ $\leftarrow$ higher than Brandes'
+    \item For each source, a \spdag of complexity $n + n$ 
   \end{itemize}
     
 \end{frame}
@@ -687,10 +719,12 @@
 
 \begin{frame}
   \frametitle{Results}
-
-  \begin{itemize}
-    \item 
-  \end{itemize}
+  
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.7\textheight, keepaspectratio]{imgs/green-results1}
+    \caption{Speedup over Brandes' on synthetic graphs ($n = 4096$)}
+  \end{figure}
     
 \end{frame}
 
@@ -699,7 +733,8 @@
   \frametitle{Conclusions}
 
   \begin{itemize}
-    \item 
+    \item Up to 2 orders of magnitude speedup
+    \item Quadratic space bottleneck
   \end{itemize}
     
 \end{frame}
