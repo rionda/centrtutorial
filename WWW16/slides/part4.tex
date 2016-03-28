@@ -87,8 +87,8 @@
   \end{itemize}
   \begin{itemize}
     \item Use vertex-based parallelism
-    \item Reduce memory usage by removing predecessors lists
     \item Virtualize high-degree nodes to address load imbalance
+    \item Reduce memory usage by removing predecessors lists
   \end{itemize}
   
 \end{frame}
@@ -224,25 +224,25 @@
   \begin{figure}[t]
     \centering
     \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/gpu-results1}
-    \caption{Speedup}
+    \caption{Speedup over Brandes' on CPU on real graphs with 32-core GPU ($s= 1k, \ldots, 100k$)}
   \end{figure}
-
+  
   \begin{itemize}
-    \item Results computed only on a sample of the graphs sources and extrapolated linearly
+    \item Results computed only on a sample of sources and extrapolated linearly
   \end{itemize}
 \end{frame}
 
 
-\begin{frame}
-  \frametitle{Results}
-
-  \begin{figure}[t]
-    \centering
-    \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/gpu-results2}
-    \caption{Speedup}
-  \end{figure}
-    
-\end{frame}
+%\begin{frame}
+%  \frametitle{Results}
+%
+%  \begin{figure}[t]
+%    \centering
+%    \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/gpu-results2}
+%    \caption{Speedup over Brandes' on CPU on real graphs with 32-core GPU}
+%  \end{figure}
+%    
+%\end{frame}
 
 
 %% Kourtellis et al.
