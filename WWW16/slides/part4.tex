@@ -6,6 +6,25 @@
   \Huge Scalable Dynamic Algorithms
 \end{frame}
 
+
+\begin{frame}
+  \frametitle{Parallelism}
+
+  \begin{itemize}
+    \item Fine grained: single concurrent BFS
+    \item Only one copy of auxiliary data structires
+    \item Synchronization needed
+    \item Better for GPUs, which have small memory
+  \end{itemize}
+  \begin{itemize}
+    \item Coarse grained: many independent BFSs
+    \item Sources are independent, embarrassingly parallel
+    \item More memory needed
+    \item Better for CPUs, which have large memory
+  \end{itemize}
+\end{frame}
+ 
+ 
 %% Sariyüce et al.
 \begin{frame}
   \frametitle{Betweenness Centrality on GPUs and Heterogeneous Architectures}
@@ -14,6 +33,215 @@
   {\huge A. E. Sariyüce, K. Kaya, E. Saule, Ü.~V.~Çatalyürek}
   \vfill
   {\large GPGPU '13: Workshop on General Purpose Processing Using GPUs}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{GPU}
+
+  \begin{quote}
+    A GPU is especially well-suited to address problems that can be expressed as \textbf{data-parallel computations} - the same program is executed on many data elements in parallel - with \textbf{high arithmetic intensity} - the ratio of arithmetic operations to memory operations.
+    
+    Because the same program is executed for each data element, there is a lower requirement for sophisticated flow control, and because it is executed on many data elements and has high arithmetic intensity, the memory access latency can be hidden with calculations instead of big data caches.\footnote{\url{http://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html}}
+  \end{quote}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Execution model}
+  \begin{columns}[onlytextwidth]
+
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item One thread per data element
+        \item Thread scheduled in blocks with barriers (wait for others at the end)
+        \item Program runs on the whole data (kernel)
+      \end{itemize}
+      \begin{itemize}
+        \item Minimize synchronization
+        \item Balance load
+        \item Coalesce memory access
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+      \begin{figure}[t]
+        \centering
+        \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/cuda}
+      \end{figure}
+    \end{column}
+  \end{columns}
+  
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Intuition}
+
+  \begin{itemize}
+    \item GPUs have huge number of cores
+    \item Use them to parallelize BFS
+    \item One core per vertex, or one core per edge
+    \item Vertex-based parallelism creates load imbalance for graphs with skewed degree distribution
+    \item Edge-based parallelism requires high memory usage
+  \end{itemize}
+  \begin{itemize}
+    \item Use vertex-based parallelism
+    \item Reduce memory usage by removing predecessors lists
+    \item Virtualize high-degree nodes to address load imbalance
+  \end{itemize}
+  
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Difference}
+  
+  \begin{columns}[onlytextwidth]
+    \begin{column}{0.5\textwidth}
+      \begin{figure}[t]
+        \centering
+        \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/gpu-vertex-bfs}
+        \caption{Vertex-based BFS}
+      \end{figure}
+    \end{column}
+    
+    \begin{column}{0.5\textwidth}
+      \begin{figure}[t]
+        \centering
+        \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/gpu-edge-bfs}
+        \caption{Edge-based BFS}
+      \end{figure}
+    \end{column}
+  \end{columns}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Vertex-based}
+  
+  \begin{columns}[onlytextwidth]
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item For each level, for each vertex in parallel
+        \item If vertex is on level
+        \item For each neighbor, adjust \pred and \paths
+        \item Atomic update on \paths needed (multiple paths can be discovered concurrently)
+        \item While backtracking, if $u \in \pred(v)$ accumulate $\dep(u) = \dep(u) + \dep(v)$
+        \item Possible load imbalance if degree skewed
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+      \begin{figure}[t]
+        \centering
+        \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/gpu-algo-vertex}
+      \end{figure}
+    \end{column}
+  \end{columns}
+  
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Edge-based}
+  
+  \begin{columns}[onlytextwidth]
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item For each level, for each edge in parallel
+        \item If edge endpoint is on level
+        \item Same as above...
+        \item While backtracking, if $u \in \pred(v)$ accumulate $\dep(u) = \dep(u) + \dep(v)$ \emph{atomically}
+        \item Multiple edges can try to update \dep concurrently
+        \item More memory (edge-based layout) \\ and more atomic operations
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+      \begin{figure}[t]
+        \centering
+        \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/gpu-algo-edge}
+      \end{figure}
+    \end{column}
+  \end{columns}
+  
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Vertex virtualization}
+
+  \begin{columns}[onlytextwidth]
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item AKA, edge packing/batching, \\ hybrid between vertex- and edge-based
+        \item Split high degree vertices into virtual ones with maximum degree $mdeg$
+        \item Equivalently, pack up to $mdeg$ edges belonging to the same vertex together
+        \item Very small $mdeg = 4$
+        \item Need additional auxiliary maps
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+      \begin{figure}[t]
+        \centering
+        \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/gpu-algo-hybrid}
+      \end{figure}
+    \end{column}
+  \end{columns}
+  
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Benefits}
+  
+  \begin{itemize}
+    \item Compared to vertex-based:
+    \begin{itemize}
+      \item Reduce load imbalance
+    \end{itemize}
+    \item Compared to edge-based:
+    \begin{itemize}
+    \item Reduce number of atomic operations
+    \item Reduce memory footprint
+    \end{itemize}
+    \item Predecessors stored implicitly in the \spdag level (reduced memory usage)
+    \item Memory layout can be further optimized to coalesce latency via \emph{striding}:
+    \begin{itemize}
+      \item Distribute edges to virtual vertices in round-robin
+      \item When accessed in parallel, they create faster sequential memory access pattern
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Results}
+
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/gpu-results1}
+    \caption{Speedup}
+  \end{figure}
+
+  \begin{itemize}
+    \item Results computed only on a sample of the graphs sources and extrapolated linearly
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Results}
+
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/gpu-results2}
+    \caption{Speedup}
+  \end{figure}
+    
 \end{frame}
 
 
