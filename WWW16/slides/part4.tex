@@ -254,3 +254,152 @@
   \vfill
   {\large TKDE: IEEE Transactions on Knowledge and Data Engineering (2015)}
 \end{frame}
+
+
+\begin{frame}
+  \frametitle{Intuition}
+
+  \begin{itemize}
+    \item Incremental, exact, space-efficient, out-of-core, parallel version of Brandes'
+    \item Handles edge addition and removal
+    \item Vertex and edge betweenness
+    \item Scalable to graphs with millions of nodes
+  \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Algorithm}
+
+  \begin{itemize}
+    \item Run a modified Brandes' on the initial graph
+    \item Keep track of \dist, \paths, \dep in a \spdag (no \pred)
+    \item On edge update, adjust the \spdag and update \betw
+  \end{itemize}
+  
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/kdb-algo}
+  \end{figure}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Data structure}
+
+  \begin{itemize}
+    \item $\spdag_s$ for each source $s \in V$
+    \item \spdag contains \dist, \paths, \dep for each other vertex $t \in V$
+    \item No predecessors \pred, re-scan neighbors and use \dist to find them
+    \begin{itemize}
+      \item Save memory - space complexity $O(n^2)$
+      \item Fixed size data structure - efficient out-of-core management
+      \item Same time complexity $O(nm)$ - in practice, makes the algorithm faster
+    \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Pivot}
+
+  \begin{itemize}
+    \item When adding or removing an edge, consider $dd = |d_{su} - d_{sv}|$
+    \item Three cases: $dd=0$, $dd=1$, $dd>1$ (analogous to Green et al.)
+    \item Last case $dd>1$ hardest - structural changes in \spdag
+    \item Find \emph{pivots} to discover structural changes
+  \end{itemize}
+  
+  \begin{definition}[Pivot]
+Let $s$ be the current source, let $\dist$ and $\dist'$ be the distance before and after an update, respectively, we define \emph{pivot} a vertex $p \mid \dist(s,p) = \dist'(s,p) \wedge \exists \, w \in \neighbors(p)$$: \dist(s,w)$$\neq$$\dist'(s,w)$.
+  \end{definition}
+  
+  \begin{itemize}
+    \item Pivots' distance unchanged $\rightarrow$ use as starting points to correct distances
+  \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Finding pivots}
+
+  \begin{itemize}
+    \item Addition - pivots in sub-dag rooted in $u_L = v$ 
+    \item Nodes moved closer must be reachable from $u_L$
+    \item Can be found during exploration while fixing \paths
+  \end{itemize}
+  \begin{itemize}
+    \item Removal - pivots may be anywhere
+    \item Need one exploration to find them
+    \item Need separate exploration from found pivots to correct distances
+  \end{itemize}
+
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.5\textheight, keepaspectratio]{imgs/kdb-bfs}
+  \end{figure}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Structural changes}
+
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.5\textheight, keepaspectratio]{imgs/kdb-cases}
+  \end{figure}
+
+  \begin{itemize}
+    \item Consider $x \in \neighbors(y)$, $x$ can either be a sibling or a predecessor of $y$
+    \item Each case requires slightly different combination of corrections for \dist, \paths, \dep
+    \item $y$ is pivot in 1d, 2e, 2f
+    \item Removal for case 1d can be optimized (pivot $y$ is sibling of $x$)
+  \end{itemize}
+  
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Scalability}
+
+  \begin{itemize}
+    \item Out-of-core
+    \item In-place update - minimize writes
+    \item Columnar storage - skip if $dd=0$
+    \item Parallelization
+  \end{itemize}
+  
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Results}
+
+  \begin{itemize}
+    \item 
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Results}
+
+  \begin{itemize}
+    \item 
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Conclusions}
+
+  \begin{itemize}
+    \item 
+  \end{itemize}
+\end{frame}
+
