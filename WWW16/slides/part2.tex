@@ -578,11 +578,11 @@
     \end{itemize}
   \end{itemize}
   \begin{itemize}
-    \item On addition of edge $u,v$ 3 cases:
+    \item On addition of edge $u,v$, let $dd = |d_{su} - d_{sv}|$:
     \begin{itemize}
-      \item $|d_{su} - d_{sv}| = 0$ same~level
-      \item $|d_{su} - d_{sv}| = 1$ adjacent~level
-      \item $|d_{su} - d_{sv}| > 1$ non-adjacent~level
+      \item $dd = 0$ same~level
+      \item $dd = 1$ adjacent~level
+      \item $dd > 1$ non-adjacent~level
     \end{itemize}
   \end{itemize}
       
@@ -595,7 +595,7 @@
   
     \begin{column}{0.5\textwidth}
       \begin{itemize}
-        \item $|d_{su} - d_{sv}| = 0$
+        \item $dd = 0$
         \item Edge creates no new shortest paths
         \item No change to betweenness \\ due to this source
       \end{itemize}
@@ -618,7 +618,7 @@
   
     \begin{column}{0.5\textwidth}
       \begin{itemize}
-        \item $|d_{su} - d_{sv}| = 1$
+        \item $dd = 1$
         \item Let $u_{high} = u ,\, u_{low} = v$
         \item Edge creates new shortest paths
         \item \spdag unchanged
@@ -680,7 +680,7 @@
   
     \begin{column}{0.5\textwidth}
       \begin{itemize}
-        \item $|d_{su} - d_{sv}| > 1$
+        \item $dd > 1$
         \item Edge creates new shortest paths
         \item Changes to \spdag (new distances)
         \item Algorithm only sketched \\ (most details missing)
@@ -710,7 +710,7 @@
   \end{itemize}
   \begin{itemize}
     \item Space: $O(n^2 + nm)$ $\leftarrow$ higher than Brandes'
-    \item For each source, a \spdag of complexity $n + n$ 
+    \item For each source, a \spdag of complexity $n + m$ 
   \end{itemize}
     
 \end{frame}

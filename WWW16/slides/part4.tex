@@ -368,10 +368,18 @@ Let $s$ be the current source, let $\dist$ and $\dist'$ be the distance before a
   \frametitle{Scalability}
 
   \begin{itemize}
-    \item Out-of-core
-    \item In-place update - minimize writes
-    \item Columnar storage - skip if $dd=0$
-    \item Parallelization
+    \item Out-of-core - stream \spdag from disk
+    \begin{itemize}
+      \item In-place update on disk to minimize writes
+    \end{itemize}
+    \item Columnar storage for \dist, \paths, \dep
+    \begin{itemize}
+      \item Read only \dist, skip rest if $dd=0$
+    \end{itemize}
+    \item Parallelization - coarse grained over $s$
+    \begin{itemize}
+      \item Implementation in MapReduce, amenable to Apache Storm/Flink/Spark
+    \end{itemize}
   \end{itemize}
   
 \end{frame}
@@ -380,26 +388,44 @@ Let $s$ be the current source, let $\dist$ and $\dist'$ be the distance before a
 \begin{frame}
   \frametitle{Results}
 
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/kdb-results1}
+    \caption{Speedup over Brandes' on synthetic and real graphs ($n = 10k$)}
+  \end{figure}
+  
   \begin{itemize}
-    \item 
+    \item In-memory (M-) version faster than out-of-core (D-)
+    \item Without predecessor (-O) always faster than with predecessors (-P)
   \end{itemize}
+  
 \end{frame}
 
 
 \begin{frame}
   \frametitle{Results}
 
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/kdb-results2}
+    \caption{Speedup over Brandes' for out-of-core version on synthetic and real graphs ($n = 1M$)}
+  \end{figure}
+  
   \begin{itemize}
-    \item 
+    \item Out-of-core version scales up to 1M nodes
+    \item Speedup up to 2 orders of magnitude
   \end{itemize}
+  
 \end{frame}
-
 
 \begin{frame}
   \frametitle{Conclusions}
 
   \begin{itemize}
-    \item 
+    \item Fully dynamic (addition and removal)
+    \item Algorithm can scale to graphs with realistic size
+    \item Ideal horizontal scalability
+    \item $O(n^2)$ space bottleneck
   \end{itemize}
 \end{frame}
 
