@@ -3,7 +3,7 @@
 \begin{frame}
   \frametitle{Part 2}
   \centering
-  \Huge Exact Incremental Algorithms
+  \Huge Exact Dynamic Algorithms
 \end{frame}
 
 
@@ -38,14 +38,14 @@
   \frametitle{Data structures}
 
   \begin{itemize}
-    \item One \spdag (aka BFS dag) for each source $s \in V$, which contains for each other vertex $v \in V$:
+    \item One $\spdag_s$ for each source $s \in V$, which contains for each other vertex $t \in V$:
     \begin{itemize}
-      \item Distance \dist, paths \paths, dependencies \dep, predecessors \pred
+      \item Distance $\dist_{st}$, paths $\paths_{st}$, dependencies $\dep_{s}(t)$, predecessors $\pred_{s}(t)$
       \item Additional per-level queues for exploration
     \end{itemize}
   \end{itemize}
   \begin{itemize}
-    \item On addition of edge $u,v$, let $dd = |d_{su} - d_{sv}|$:
+    \item On addition of edge $(u,v)$, let $dd = |d_{su} - d_{sv}|$:
     \begin{itemize}
       \item $dd = 0$ same~level
       \item $dd = 1$ adjacent~level
@@ -236,7 +236,7 @@
     \item \emph{Cycle} $C \subseteq E$ s.t. $\forall v \in V$, $v$ incident to even number of edges in $C$
     \item Represented as edge incidence vector $\nu \in \{ 0,1 \}^{|E|}$, where $\nu(e) = 1 \iff e \in C$ 
     \item \emph{Cycle Basis} = set of linearly independent cycles
-    \item \emph{Minimum Cycle Basis} = on weighted graph with non-negative weights $w_e$, cycle basis of minimum total weight $w(C) = \sum_{i} w(C_i)$ where $w(C_i) = \sum_{e \in C_v} w_e$
+    \item \emph{Minimum Cycle Basis} = on weighted graph with non-negative weights $w_e$, cycle basis of minimum total weight $w(C) = \sum_{i} w(C_i)$ where $w(C_i) = \sum_{e \in C_i} w_e$
   \end{itemize}  
 \end{frame}
 
@@ -391,7 +391,7 @@
   \begin{align*}
     \large
     \betw_{o}(v) = \begin{cases}
-      \frac{|V_{G_j}|}{\paths_{st}}		& \text{ if } v \in\{ \spath_{ct} \setminus t \} \\
+      \frac{|V_{G_j}|}{\paths_{st}}		& \text{ if } v \in\{ \spath_{jt} \setminus t \} \\
       0 						& \text{ otherwise }
     \end{cases}
   \end{align*}
@@ -428,16 +428,6 @@
     \betw(v) = \betw_{MUC}(v) + \sum_{G_j \subset G} \betw_{o}(v) + \sum_{G_j, G_k \subset G} \betw_{x}(v)
   \end{align*}
   }
-\end{frame}
-
-
-\begin{frame}
-  \frametitle{Updating MUCs -- Removal}
-  
-  \begin{figure}[t]
-    \centering
-    \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/qube-removal}
-  \end{figure}
 \end{frame}
   
 
@@ -537,7 +527,7 @@
     \item G. Ramalingam and T. Reps, ``\emph{On the Computational Complexity of Incremental Algorithms},'' CS, Univ. of Wisconsin at Madison, Tech. Report 1991
     \item Relevant quantities: number of shortest paths \paths, distances \dist, predecessors \pred
     \item Keep a copy of the old quantities while updating
-    \item Support only edge addition
+    \item Support only edge addition (on weighted graphs)
   \end{itemize}
     
 \end{frame}
@@ -547,12 +537,12 @@
   \frametitle{Edge update}
   
   \begin{itemize}
-    \item Compute new shortest paths from updated endpoints $(v,w)$
+    \item Compute new shortest paths from updated endpoints $(u,v)$
     \item If a new shortest path of the same length is found, updated number of paths as
   \end{itemize}
   {\Large
   \begin{align*}
-    \paths_{st} = \paths_{st} + \paths_{sv} \times \paths_{wt}
+    \paths_{st} = \paths_{st} + \paths_{su} \times \paths_{vt}
   \end{align*}
   }
     \begin{itemize}
@@ -562,7 +552,7 @@
   \end{itemize}
     {\Large
   \begin{align*}
-    \betw(u) = \betw(u) - \paths_{su} \times \paths_{ut} / \paths_{st}
+    \betw(w) = \betw(w) - \paths_{sw} \times \paths_{wt} / \paths_{st}
   \end{align*}
   }
 \end{frame}
@@ -573,7 +563,7 @@
   
   \begin{itemize}
     \item Complex bookkeeping: need to consider all affected vertices which have new alternative shortest paths of equal length (not covered in the original algorithm)
-    \item Amend \pred during update propagation $\rightarrow$ concurrent changes to the \spath\dag
+    \item Amend \pred during update propagation $\rightarrow$ concurrent changes to the \spdag
     \item Need to track now-unreachable nodes separately
   \end{itemize}
   
@@ -653,6 +643,7 @@
   \begin{itemize}
     \item Let $\displaystyle E^* = \bigcup_{e \in \allspath} e \subseteq E$ be the set of edges that are part of any shortest path 
     \item Let $\displaystyle m^* = |E^*|$ and $\displaystyle \nu^* = \max_{v \in V} |\spdag_v|$ the maximum number of edges in shortest paths through any single vertex $v$
+    \item $n < \nu^* < m^* < m$
     \item After incremental update, betweenness can be recomputed in
     \begin{itemize}
       \item $O(\nu^* n)$ time using $O(\nu^* n)$ space
