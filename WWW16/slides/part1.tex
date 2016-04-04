@@ -26,3 +26,26 @@
     \item Backtracking: Dependency Accumulation
   \end{itemize}
 \end{frame}
+
+
+\begin{frame}
+  \frametitle{Path Dependency}
+  
+  \begin{itemize}
+    \item Pair dependency of $(s,w)$ on $v$:
+      \[\dep_{st}(w)=\frac{\paths_{sw}(v)}{\paths_{sw}}\]
+    \item Dependency of a node $s$ on another node $v$:
+      \[\dep_s(v)=\sum_{t \in V}\dep_{st}(w)\]
+    \item Can be computed recursively:
+    \[
+    \dep_s(v)=\sum_{w \mid v \in \pred_s(w) } \frac{\paths_{sv}}{\paths_{sw}} \left( 1 + \dep_{s}(w) \right)
+    \]
+    \item Betweenness can be expressed as function of dependencies:
+      \[ \betw(v) = \sum_{s \neq v} \dep_s(v) \]
+  \end{itemize}
+  
+  \begin{figure}[H]
+    \centering
+    \includegraphics[scale=1]{imgs/path-dependency}
+  \end{figure}
+\end{frame}

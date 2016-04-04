@@ -7,115 +7,202 @@
 \end{frame}
 
 
-%% Nasre et al.
+%% Green et al.
 \begin{frame}
-  \frametitle{Betweenness Centrality -- Incremental and Faster}
+  \frametitle{A Fast Algorithm for Streaming Betweenness Centrality}
   \centering
   \vfill
-  {\huge M. Nasre, M. Pontecorvi, V. Ramachandran}
+  {\huge O. Green, R. McColl, D. A. Bader}
   \vfill
-  {\large MFCS '14: Mathematical Foundations of Computer Science}
+  {\large SocialCom '12: International Conference on Social Computing}
 \end{frame}
 
-
 \begin{frame}
-  \frametitle{Path Dependency}
-  
+  \frametitle{Intuition}
+
   \begin{itemize}
-    \item Pair dependency of $(s,w)$ on $v$:
-      \[\dep_{st}(w)=\frac{\paths_{sw}(v)}{\paths_{sw}}\]
-    \item Dependency of a node $s$ on another node $v$:
-      \[\dep_s(v)=\sum_{t \in V}\dep_{st}(w)\]
-    \item Can be computed recursively:
-    \[
-    \dep_s(v)=\sum_{w \mid v \in \pred_s(w) } \frac{\paths_{sv}}{\paths_{sw}} \left( 1 + \dep_{s}(w) \right)
-    \]
-    \item Betweenness can be expressed as function of dependencies:
-      \[ \betw(v) = \sum_{s \neq v} \dep_s(v) \]
-  \end{itemize}
-  
-  \begin{figure}[H]
-    \centering
-    \includegraphics[scale=1]{imgs/path-dependency}
-  \end{figure}
-\end{frame}
-
-
-\begin{frame}
-  \frametitle{Main Result}
-
-  \begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{imgs/npr14-main-result}
-  \end{figure}
-\end{frame}
-
-
-\begin{frame}
-  \frametitle{Lemmas}
-
-  \begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{imgs/npr14-lemmas}
-  \end{figure}
-\end{frame}
-
-
-\begin{frame}
-  \frametitle{SSSP DAG Update}
-
-  \begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{imgs/npr14-algo3}
-  \end{figure}
-\end{frame}
-
-
-\begin{frame}
-  \frametitle{Edge Update}
-
-  \begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{imgs/npr14-algo4}
-  \end{figure}
-\end{frame}
-
-
-\begin{frame}
-  \frametitle{Space-Efficient Variant $O(n^2)$}
-  
-  \begin{itemize}
-    \item Do not store the \sssp \dag
-    \item Store only $E^*$
-    \item Updated \dag can be build in $O(m^*)$ time
+    \item Make Brandes' algorithm incremental
+    \item Keep additional data structures to avoid recomputing partial results
     \begin{itemize}
-      \item Time $O(m^* \times n)$
-      \item Compute ${E'}^*$ from $E^*$, then $\dag'(s)$ from ${E'}^*$
+      \item Rooted \spdag for each source $s \in V$
+      \item Depth in the tree for $t$ = distance of $t$ from $s$
     \end{itemize}
-    \item Space $O(m^* + n^2)$ to store $E^*$ and $n^2$ distances $\dist(s,t)$ and shortest paths $\paths_{st}$
+    \item Re-run parts of modified Brandes' algorithm on edge update
+    \item Support only edge addition (on unweighted graphs)
   \end{itemize}
+    
 \end{frame}
 
 
 \begin{frame}
-  \frametitle{Comparison}
-
-  \begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{imgs/npr14-comparison}
-  \end{figure}
-\end{frame}
-
-
-\begin{frame}
-  \frametitle{Shortcomings}
+  \frametitle{Data structures}
 
   \begin{itemize}
-    \item Not fully dynamic (no edge removal)
-    \item $m^*$ can be large in practice
-    \item Non-trivial to parallelize (need to access pairs of \sssp \dag at a time)
-    \item Does not solve main bottleneck of most algorithms: $O(n^2)$ memory
+    \item One \spdag (aka BFS dag) for each source $s \in V$, which contains for each other vertex $v \in V$:
+    \begin{itemize}
+      \item Distance \dist, paths \paths, dependencies \dep, predecessors \pred
+      \item Additional per-level queues for exploration
+    \end{itemize}
   \end{itemize}
+  \begin{itemize}
+    \item On addition of edge $u,v$, let $dd = |d_{su} - d_{sv}|$:
+    \begin{itemize}
+      \item $dd = 0$ same~level
+      \item $dd = 1$ adjacent~level
+      \item $dd > 1$ non-adjacent~level
+    \end{itemize}
+  \end{itemize}
+      
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Same level addition}
+  \begin{columns}[onlytextwidth]
+  
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item $dd = 0$
+        \item Edge creates no new shortest paths
+        \item No change to betweenness \\ due to this source
+      \end{itemize}
+    \end{column}
+    
+    \begin{column}{0.5\textwidth}
+      \begin{figure}[t]
+        \centering
+        \includegraphics[width=\textwidth, height=\textheight, keepaspectratio]{imgs/green-0lvl-compressed}
+      \end{figure}
+    \end{column}
+  \end{columns}
+  
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Adjacent level addition}
+  \begin{columns}[onlytextwidth]
+  
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item $dd = 1$
+        \item Let $u_{high} = u ,\, u_{low} = v$
+        \item Edge creates new shortest paths
+        \item \spdag unchanged
+        \item Changes in \paths confined to sub-dag rooted in $u_{low}$
+        \item Changes in \dep also spread above to decrease old dependency and account for new dependency
+        \item Example: $w$ and predecessors have now only $\sfrac{1}{2}$ of dependency on sub-dag rooted in $u_{low}$
+      \end{itemize}
+    \end{column}
+    
+    \begin{column}{0.5\textwidth}
+      \begin{figure}[t]
+        \centering
+        \includegraphics[width=\textwidth, height=\textheight, keepaspectratio]{imgs/green-1lvl-compressed}
+      \end{figure}
+    \end{column}
+  \end{columns}
+    
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Algorithm}
+  \begin{columns}[onlytextwidth]
+  
+    \begin{column}{0.3\textwidth}
+      \begin{itemize}
+        \item During exploration:
+        \begin{itemize}
+          \item Fix \paths
+          \item Mark visited vertices
+          \item Enqueue for further processing
+        \end{itemize}
+      \end{itemize}
+      \begin{itemize}
+        \item During backtracking:%
+        \begin{itemize}
+          \item Fix \dep and \betw
+          \item Recurse up the whole \spdag
+        \end{itemize}
+      \end{itemize}
+    \end{column}
+    
+    \begin{column}{0.7\textwidth}
+      \begin{figure}[t]
+        \centering
+%        \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/green-algo}
+        \includegraphics[width=0.45\textwidth, height=0.8\textheight, keepaspectratio, valign=t]{imgs/green-algo1}
+        \includegraphics[width=0.6\textwidth, height=0.8\textheight, keepaspectratio, valign=t]{imgs/green-algo2}
+      \end{figure}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Non-adjacent level addition}
+  
+  \begin{columns}[onlytextwidth]
+  
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item $dd > 1$
+        \item Edge creates new shortest paths
+        \item Changes to \spdag (new distances)
+        \item Algorithm only sketched \\ (most details missing)
+      \end{itemize}
+    \end{column}
+    
+    \begin{column}{0.5\textwidth}
+      \begin{figure}[t]
+        \centering
+        \includegraphics<1>[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/green-2lvl-before-compressed}
+          \transdissolve<2>
+          \transduration{2}
+        \includegraphics<2>[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/green-2lvl-after-compressed}
+      \end{figure}
+    \end{column}
+  \end{columns}
+    
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Complexity}
+
+  \begin{itemize}
+    \item Time: $O(n^2 + nm)$ $\leftarrow$ same as Brandes'
+    \item In practice, algorithm is much faster
+  \end{itemize}
+  \begin{itemize}
+    \item Space: $O(n^2 + nm)$ $\leftarrow$ higher than Brandes'
+    \item For each source, a \spdag of complexity $n + m$ 
+  \end{itemize}
+    
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Results}
+  
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.7\textheight, keepaspectratio]{imgs/green-results1}
+    \caption{Speedup over Brandes' on synthetic graphs ($n = 4096$)}
+  \end{figure}
+    
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Conclusions}
+
+  \begin{itemize}
+    \item Up to 2 orders of magnitude speedup
+    \item Super-quadratic space bottleneck
+  \end{itemize}
+    
 \end{frame}
 
 
@@ -136,6 +223,7 @@
     \item No need to update all vertices when a new edge is added
     \item Prune vertices whose \betw does not change
     \item Large reduction in all-pairs shortest paths to be re-computed
+    \item Support both edge additions and removals
   \end{itemize}
 \end{frame}
 
@@ -449,6 +537,7 @@
     \item G. Ramalingam and T. Reps, ``\emph{On the Computational Complexity of Incremental Algorithms},'' CS, Univ. of Wisconsin at Madison, Tech. Report 1991
     \item Relevant quantities: number of shortest paths \paths, distances \dist, predecessors \pred
     \item Keep a copy of the old quantities while updating
+    \item Support only edge addition
   \end{itemize}
     
 \end{frame}
@@ -518,7 +607,7 @@
   \begin{figure}[t]
     \centering
     \includegraphics[width=\textwidth, height=0.7\textheight, keepaspectratio]{imgs/kas-results2}
-%    \caption{}
+    \caption{Speedup over Brandes' in comparison with QUBE}
   \end{figure}
 
   \begin{itemize}
@@ -529,191 +618,128 @@
 \end{frame}
 
 
-%% Green et al.
+%% Nasre et al.
 \begin{frame}
-  \frametitle{A Fast Algorithm for Streaming Betweenness Centrality}
+  \frametitle{Betweenness Centrality -- Incremental and Faster}
   \centering
   \vfill
-  {\huge O. Green, R. McColl, D. A. Bader}
+  {\huge M. Nasre, M. Pontecorvi, V. Ramachandran}
   \vfill
-  {\large SocialCom '12: International Conference on Social Computing}
+  {\large MFCS '14: Mathematical Foundations of Computer Science}
 \end{frame}
+
 
 \begin{frame}
   \frametitle{Intuition}
-
+  
   \begin{itemize}
-    \item Make Brandes' algorithm incremental
-    \item Support only edge addition (on unweighted graphs)
-    \item Keep additional data structures to avoid recomputing partial results
+    \item Keep \spdag for each vertex
+    \item Re-use information from \spdag of updated edge endpoints
+    \item Adding new edges will \emph{not} make old edges part of a \spath
+    \item Support only edge addition (on weighted graphs)
+  \end{itemize}
+    
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Main Result}
+
+%  \begin{figure}[H]
+%    \centering
+%    \includegraphics[width=0.5\textwidth]{imgs/npr14-main-result}
+%  \end{figure}
+  
+  \begin{itemize}
+    \item Let $\displaystyle E^* = \bigcup_{e \in \allspath} e \subseteq E$ be the set of edges that are part of any shortest path 
+    \item Let $\displaystyle m^* = |E^*|$ and $\displaystyle \nu^* = \max_{v \in V} |\spdag_v|$ the maximum number of edges in shortest paths through any single vertex $v$
+    \item After incremental update, betweenness can be recomputed in
     \begin{itemize}
-      \item Rooted \spdag for each source $s \in V$
-      \item Depth in the tree for $t$ = distance of $t$ from $s$
+      \item $O(\nu^* n)$ time using $O(\nu^* n)$ space
+      \item $O(m^* n)$ time using $O(n^2)$ space
     \end{itemize}
-    \item Re-run parts of modified Brandes' algorithm on edge update
+    \item Bounded by $O(mn + n^2)$
+    \item Logarithmic factor better than Brandes' (on weighted graphs)
   \end{itemize}
-    
 \end{frame}
 
 
 \begin{frame}
-  \frametitle{Data structures}
+  \frametitle{Lemma 1}
 
-  \begin{itemize}
-    \item One \spdag (aka BFS dag) for each source $s \in V$, which contains for each other vertex $v \in V$:
-    \begin{itemize}
-      \item Distance \dist, paths \paths, dependencies \dep, predecessors \pred
-      \item Additional per-level queues for exploration
-    \end{itemize}
-  \end{itemize}
-  \begin{itemize}
-    \item On addition of edge $u,v$, let $dd = |d_{su} - d_{sv}|$:
-    \begin{itemize}
-      \item $dd = 0$ same~level
-      \item $dd = 1$ adjacent~level
-      \item $dd > 1$ non-adjacent~level
-    \end{itemize}
-  \end{itemize}
-      
-\end{frame}
-
-
-\begin{frame}
-  \frametitle{Same level addition}
-  \begin{columns}[onlytextwidth]
-  
-    \begin{column}{0.5\textwidth}
-      \begin{itemize}
-        \item $dd = 0$
-        \item Edge creates no new shortest paths
-        \item No change to betweenness \\ due to this source
-      \end{itemize}
-    \end{column}
-    
-    \begin{column}{0.5\textwidth}
-      \begin{figure}[t]
-        \centering
-        \includegraphics[width=\textwidth, height=\textheight, keepaspectratio]{imgs/green-0lvl-compressed}
-      \end{figure}
-    \end{column}
-  \end{columns}
-  
-\end{frame}
-
-
-\begin{frame}
-  \frametitle{Adjacent level addition}
-  \begin{columns}[onlytextwidth]
-  
-    \begin{column}{0.5\textwidth}
-      \begin{itemize}
-        \item $dd = 1$
-        \item Let $u_{high} = u ,\, u_{low} = v$
-        \item Edge creates new shortest paths
-        \item \spdag unchanged
-        \item Changes in \paths confined to sub-dag rooted in $u_{low}$
-        \item Changes in \dep also spread above to decrease old dependency and account for new dependency
-        \item Example: $w$ and predecessors have now only $\sfrac{1}{2}$ of dependency on sub-dag rooted in $u_{low}$
-      \end{itemize}
-    \end{column}
-    
-    \begin{column}{0.5\textwidth}
-      \begin{figure}[t]
-        \centering
-        \includegraphics[width=\textwidth, height=\textheight, keepaspectratio]{imgs/green-1lvl-compressed}
-      \end{figure}
-    \end{column}
-  \end{columns}
-    
-\end{frame}
-
-
-\begin{frame}
-  \frametitle{Algorithm}
-  \begin{columns}[onlytextwidth]
-  
-    \begin{column}{0.3\textwidth}
-      \begin{itemize}
-        \item During exploration:
-        \begin{itemize}
-          \item Fix \paths
-          \item Mark visited vertices
-          \item Enqueue for further processing
-        \end{itemize}
-      \end{itemize}
-      \begin{itemize}
-        \item During backtracking:%
-        \begin{itemize}
-          \item Fix \dep and \betw
-          \item Recurse up the whole \spdag
-        \end{itemize}
-      \end{itemize}
-    \end{column}
-    
-    \begin{column}{0.7\textwidth}
-      \begin{figure}[t]
-        \centering
-%        \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/green-algo}
-        \includegraphics[width=0.45\textwidth, height=0.8\textheight, keepaspectratio, valign=t]{imgs/green-algo1}
-        \includegraphics[width=0.6\textwidth, height=0.8\textheight, keepaspectratio, valign=t]{imgs/green-algo2}
-      \end{figure}
-    \end{column}
-  \end{columns}
-\end{frame}
-
-
-\begin{frame}
-  \frametitle{Non-adjacent level addition}
-  
-  \begin{columns}[onlytextwidth]
-  
-    \begin{column}{0.5\textwidth}
-      \begin{itemize}
-        \item $dd > 1$
-        \item Edge creates new shortest paths
-        \item Changes to \spdag (new distances)
-        \item Algorithm only sketched \\ (most details missing)
-      \end{itemize}
-    \end{column}
-    
-    \begin{column}{0.5\textwidth}
-      \begin{figure}[t]
-        \centering
-        \includegraphics<1>[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/green-2lvl-before-compressed}
-          \transdissolve<2>
-          \transduration{2}
-        \includegraphics<2>[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/green-2lvl-after-compressed}
-      \end{figure}
-    \end{column}
-  \end{columns}
-    
-\end{frame}
-
-
-\begin{frame}
-  \frametitle{Complexity}
-
-  \begin{itemize}
-    \item Time: $O(n^2 + nm)$ $\leftarrow$ same as Brandes'
-    \item In practice, algorithm is much faster
-  \end{itemize}
-  \begin{itemize}
-    \item Space: $O(n^2 + nm)$ $\leftarrow$ higher than Brandes'
-    \item For each source, a \spdag of complexity $n + m$ 
-  \end{itemize}
-    
-\end{frame}
-
-
-\begin{frame}
-  \frametitle{Results}
-  
-  \begin{figure}[t]
+  \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth, height=0.7\textheight, keepaspectratio]{imgs/green-results1}
-    \caption{Speedup over Brandes' on synthetic graphs ($n = 4096$)}
+    \includegraphics[width=\textwidth, trim={0 8cm 0 0}, clip]{imgs/npr14-lemmas}
   \end{figure}
-    
+  
+  \begin{itemize}
+    \item Edge $(u,v) \not\in \spath_{xu} \, \wedge \, (u,v)\not\in \spath_{vx}$ as edge weights are positive
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Lemma 2}
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth, trim={0 0 0 3.5cm}, clip]{imgs/npr14-lemmas}
+  \end{figure}
+  
+  \begin{itemize}
+    \item Updates to \paths and \dist in constant time
+    \item Need to update \pred to complete \spdag update
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{\spdag Update}
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{imgs/npr14-algo3}
+  \end{figure}
+  
+  \begin{itemize}
+    \item UN-changed $\rightarrow dd=0$, NUM-changed $\rightarrow dd=1$, WT-changed $\rightarrow dd>1$
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Edge Update}
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{imgs/npr14-algo4}
+  \end{figure}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Space-Efficient Variant $O(n^2)$}
+  
+  \begin{itemize}
+    \item Do not store the \spdag
+    \item Store only $E^*$
+    \item Updated \spdag can be build in $O(m^*)$ time
+    \begin{itemize}
+      \item Time $O(m^* \, n)$
+      \item Compute ${E'}^*$ from $E^*$, then $\spdag'_{s}$ from ${E'}^*$
+    \end{itemize}
+    \item Space $O(m^* + n^2)$ to store $E^*$ and $n^2$ distances $\dist(s,t)$ and shortest paths $\paths_{st}$
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Comparison}
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{imgs/npr14-comparison}
+  \end{figure}
 \end{frame}
 
 
@@ -721,8 +747,10 @@
   \frametitle{Conclusions}
 
   \begin{itemize}
-    \item Up to 2 orders of magnitude speedup
-    \item Quadratic space bottleneck
+    \item Provably faster than Brandes' on weighted graphs
+    \item However $m^*$ can be large in practice
+    \item No experiments
+    \item Hard to parallelize (need to access pairs of \spdag at a time)
+    \item Still has main bottleneck of most algorithms: $O(n^2)$ memory
   \end{itemize}
-    
 \end{frame}
