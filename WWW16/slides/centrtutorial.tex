@@ -1,5 +1,19 @@
-\documentclass[aspectratio=169]{beamer}
+%\documentclass[aspectratio=169]{beamer}
+\documentclass{beamer}
 \mode<presentation>
+
+{
+  \usetheme{default}
+  \usecolortheme{default}
+  \usefonttheme{default}
+  \setbeamertemplate{navigation symbols}{}
+  \setbeamertemplate{caption}[numbered]
+}
+
+\usepackage{textcomp}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+%\usepackage[utf8]{inputenc}
 \usepackage{dsfont}
 \usepackage{exscale}
 \usepackage[square,numbers]{natbib}     % better references
@@ -7,19 +21,23 @@
 \usepackage{dsfont}
 \usepackage{mdwlist}
 \usepackage{amsmath}
-\usepackage{lmodern}
 \usepackage{booktabs}
 \usepackage{subfigure}
 \usepackage{xspace}
 \usepackage{pifont} % ding chars
 \usepackage[export]{adjustbox}
 \usepackage{xfrac} % sfrac
+\usepackage{silence}
+\WarningFilter{latexfont}{Font shape}
+
 
 \usetheme[height=0pt]{Rochester}
 %\useoutertheme[footline=empty]{miniframes}
 \useinnertheme{circles}
 \setbeamercolor{math text}{fg=red}
 \setbeamercolor{frametitle}{fg=blue}
+\setbeamercolor{alerted text}{fg=blue}
+\let\emph\alert
 %\setbeamercolor{framesubtitle}{fg=blue}
 \setbeamertemplate{frametitle}
 {
@@ -30,7 +48,25 @@
 }
 \beamertemplatenavigationsymbolsempty
 
+%% slide number
+\addtobeamertemplate{navigation symbols}{}{%
+    \usebeamerfont{footline}%
+    \usebeamercolor[fg]{footline}%
+    \hspace{1em}%
+    \insertframenumber/\inserttotalframenumber
+}
 \setbeamertemplate{caption}{\raggedright\insertcaption\par} % remove "Figure" in captions
+
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
 
 \newcommand{\purple}{\color{purple}}
 \newcommand{\black}{\color{black}}
@@ -40,7 +76,7 @@
 \newcommand{\cmark}{\text{\ding{51}}}%
 \newcommand{\xmark}{\text{\ding{55}}}%
 
-%\newcommand*{\allsp}{\ensuremath{\mathbb{S}}\xspace}
+\newcommand*{\allsp}{\ensuremath{\mathbb{S}}\xspace}
 \newcommand*{\Sam}{{\cal S}\xspace}
 \newcommand*{\range}{\mathcal{R}\xspace}
 \newcommand*{\expectation}{\mathbb{E}\xspace}
@@ -67,24 +103,18 @@
 
 \newtheorem{Claim}{Claim}
 
-%% slide number
-\addtobeamertemplate{navigation symbols}{}{%
-    \usebeamerfont{footline}%
-    \usebeamercolor[fg]{footline}%
-    \hspace{1em}%
-    \insertframenumber/\inserttotalframenumber
-}
-
-\title{Centrality Measures on Big Graphs\\Exact, Approximated, and Distributed Algorithms}
-\author[Bonchi, De-Francisci-Morales, Riondato]{Francesco Bonchi\inst{1} \and
-Gianmarco De-Francisci-Morales\inst{2} \and Matteo Riondato\inst{3}}
+\title{Centrality Measures on Big Graphs:\\Exact, Approximated, and Distributed Algorithms}
+\author[Bonchi, De Francisci Morales, Riondato]{Francesco Bonchi\inst{1,2}\\ \and
+Gianmarco De Francisci Morales\inst{3}\\ \and Matteo Riondato\inst{4}}
 \date[WWW'16]{WWW'16 -- Montr\'eal, April 11--15, 2016}
   \institute[ISI, Qatar Computing Research Institute, TwoSigma]{
-  \inst{1} ISI Foundation
+  \inst{1} ISI Foundation, Turin (Italy)
   \and
-  \inst{2} Qatar Computing Research Institute
+  \inst{2} Eurecat, Technological Center of Catalonia, Barcelona (Spain)
   \and
-  \inst{3} Two Sigma Investments
+  \inst{3} Qatar Computing Research Institute, Doha (Qatar)
+  \and
+  \inst{4} Two Sigma Investments, NYC (USA)
 }
 
 \begin{document}
@@ -92,54 +122,27 @@ Gianmarco De-Francisci-Morales\inst{2} \and Matteo Riondato\inst{3}}
   \titlepage
 \end{frame}
 
-\begin{frame}
-  \frametitle{Notation}
-  \begin{itemize}
-    \item Graph $G=(V,E)$. $|V|=n$, $|E|=m$.
-    \item All Shortest Paths (SPs) from node $s$ to node $t$: $\spath_{st}$.
-    \item All shortest paths in the graph:
-      $\allspath_G=\cup_{s,t}\spath_{st}$.
-    \item Number of SPs from $s$ to $t$: $\paths_{st}=|\spath_{st}|$.
-    \item Number of SPs from $s$ to $t$ that go through $w$: $\paths_{st}(w)$.
-    \item Distance of $s$ to $t$: $\dist_{st}$.
-    \item Pair dependency of $(s,t)$ on $w$:
-      $\dep_{st}(w)=\paths_{st}(w)/\paths_{st}$.
-    \item Dependency of a node $s$ on another node $w$:
-      $\dep_s(w)=\sum_{t \in V}\dep_{st}(v)$.
-    \item Predecessors of a node $w$ in a shortest path DAG from source $s$:
-      $\pred_s(w)$
-    \item An edge $e$ is \emph{added} and \emph{removed} (addition and removal, no insertion, deletion)
-    \item Neighbors of vertex $v$: $\neighbors(v)$
-  \end{itemize}
-\end{frame}
+%---------------------------------------------------------------------- SLIDE -
 
-\begin{frame}
-  \frametitle{Summary}
-  
-  \begin{table}[t!]
-    \vspace{-3mm}
-    \caption{Comparison with previous studies:  vertex ($C_V$) and edge centrality  ($C_E$), edge addition (+) and removal (-), parallel and streaming computation ($\|$), size of the largest graph used in the experiments ($|V|$ and $|E|$).
-    Note that \citet{NasrePR14} have smaller time complexity than Brandes' and other algorithms.}
-    \centering
-    \small
-    \tabcolsep=0.06cm
-    \begin{tabular}{ccccccccrr}
-    \toprule
-    Method							& Year 	&	Space				&	$C_V$	&	$C_E$	&	$+$	&	$-$	&	$\|$	&	$|V|$ & $|E|$	\\
-    \midrule
-    \citet{LeeLPCC12} 					& 2012	&	$\mathcal{O}(n^2$+$m)$	&	$\cmark$	&	$\xmark$	&	$\cmark$	&	$\cmark$	&	$\xmark$		&	12k	&	65k 		\\
-    \citet{GreenMB12}		& 2012 	&	$\mathcal{O}(n^2$+$nm)$	&	$\cmark$	&	$\xmark$	&	$\cmark$	&	$\xmark$	&	$\xmark$		&	23k	&	94k		\\
-    \citet{KasWCC13}				& 2013	&	$\mathcal{O}(n^2$+$nm)$	&	$\cmark$	&	$\xmark$	&	$\cmark$	&	$\xmark$	&	$\xmark$		&	8k	&	19k		\\
-    %\citet{mclaughlin14gpu-betweenness}	& 2014	&	$\mathcal{O}(n^2)$		&	$\cmark$	&	$\xmark$	&	$\cmark$	&	$\xmark$	&	$\cmark$		&	1M	&	3.1M		\\
-    \citet{NasrePR14}				& 2014	&	$\mathcal{O}(n^2)$	&	$\cmark$	&	$\xmark$	&	$\cmark$	&	$\xmark$	&	$\xmark$		&	-	&	-		\\
-    \citet{KourtellisMB15}							& 2014	&	$\mathcal{O}(n^2)$		&	$\cmark$	&	$\cmark$	&	$\cmark$	&	$\cmark$	&	$\cmark$		&	2.2M	&	5.7M		\\
-    \bottomrule
-    \end{tabular}
-    \label{tab:rel-work}
-  \end{table}
-\end{frame}
+\frame{
+  \frametitle{Acknowledgements}
 
-\input{part1}
+\begin{itemize}
+  \item Paolo Boldi
+  \item Andreas Kaltenbrunner
+  \item Evgenios M. Kornaropoulos
+  \item Nicolas Kourtellis
+  \item Eli Upfal
+  \item Sebastiano Vigna
+\end{itemize}
+
+}
+
+\include{part1}
+% Contains
+%           - Intro
+%           - Overview of centrality measures
+%           - Axioms for centrality
 
 \input{part2}
 
