@@ -17,6 +17,7 @@
   {\large SocialCom '12: International Conference on Social Computing}
 \end{frame}
 
+
 \begin{frame}
   \frametitle{Intuition}
 
@@ -743,5 +744,142 @@
     \item No experiments
     \item Hard to parallelize (need to access pairs of \spdag at a time)
     \item Still has main bottleneck of most algorithms: $O(n^2)$ memory
+  \end{itemize}
+\end{frame}
+
+
+%% Sariyuce et al. (incremental closeness)
+\begin{frame}
+  \frametitle{Incremental Algorithms for Closeness Centrality}
+  \centering
+  \vfill
+  {\huge A. E. Sariyüce, K. Kaya, E. Saule, U.~V.~Çatalyürek }
+  \vfill
+  {\large IEEE BigData '13: International Conference on Big Data}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Intuition}
+
+  \begin{itemize}
+    \item Algorithm with pruning based on level difference (similar to Green et al.)
+    \item Additional pruning by bi-connected decomposition (similar to QUBE)
+    \item Applied to closeness centrality (still solves APSP)
+    \item Reminder: closeness centrality
+    \item 
+  \end{itemize}
+    
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Preliminaries}
+
+  \begin{itemize}
+    \item Best static algorithm $O(nm)$ time
+  \end{itemize}
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth, height=0.7\textheight, keepaspectratio]{imgs/sksc-algo1}
+  \end{figure}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Cases}
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{imgs/sksc-cases}
+  \end{figure}
+  
+  \begin{itemize}
+    \item Usual cases: $dd=0$, $dd=1$, $dd>1$
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Pruning - level difference}
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth, height=0.7\textheight, keepaspectratio]{imgs/sksc-algo2}
+  \end{figure}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Pruning - biconnected components}
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth, height=0.5\textheight, keepaspectratio]{imgs/sksc-biconnected}
+  \end{figure}
+
+  \begin{itemize}
+    \item If graph has articulation points
+    \item Change in $A$ can change closeness of any vertex in $B$
+    \item It is enough to compute change for $u$ (constant factor is added for the rest of $B$)
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Maintaining biconnected decomposition}
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth, height=0.5\textheight, keepaspectratio]{imgs/sksc-bidecomp}
+  \end{figure}
+
+  \begin{itemize}
+    \item Assume edge $(b,d)$ added
+    \item Similar to QUBE
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{\sssp hybridization}
+
+  \begin{itemize}
+    \item BFS can be performed in two ways
+    \item \emph{Top-down:} process vertices at distance $d$ to find vertices at distance $d+1$
+    \item \emph{Bottom-up:} after vertices at distance $d$ are found, process all unprocessed vertices to see if they are neighbors of the frontier
+    \item Top-down is better for initial rounds, bottom-up better for final rounds
+    \item Hybridization: use best option at each round
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Fraction of cases}
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth, height=0.5\textheight, keepaspectratio]{imgs/sksc-results1}
+  \end{figure}
+
+  \begin{itemize}
+    \item Probability distribution for level difference $dd$
+    \item Most edges are easy cases
+  \end{itemize}
+\end{frame}
+    
+\begin{frame}
+  \frametitle{Speedup}
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth, height=0.5\textheight, keepaspectratio]{imgs/sksc-results2}
+  \end{figure}
+
+  \begin{itemize}
+    \item Speedup of 2 orders of magnitude
+    \item Mostly due to level pruning
+    \item Biconnected decomposition and hybridization also give good speedups
   \end{itemize}
 \end{frame}
