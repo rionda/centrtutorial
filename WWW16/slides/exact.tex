@@ -8,7 +8,7 @@
       \begin{enumerate}
         \item the standard algorithm for closeness
         \item the standard algorithm for betweenness
-        \item a practically faster algorithm through shattering and compression
+        \item a faster betweenness algorithm through shattering and compression
         \item a GPU-Based algorithm for betweenness
       \end{enumerate}
     \item Exact algorithms for dynamic graphs
@@ -25,12 +25,133 @@
 \begin{frame}
   \centering
   \vfill
-  {\Huge A Faster Algorithm for Betweenness Centrality}
+  {\huge Exact Algorithm for Closeness Centrality}
+  \vfill
+  {\Large(folklore)}
+  \vfill
+\end{frame}
+
+\begin{frame}
+  \frametitle{Exact Algorithm for Closeness}
+    \vfill
+    Recall the definition:
+    \[
+      \closeness(x)=\frac{1}{\sum_{y\neq x}d(x,y)}
+    \]
+    \vfill
+    \pause
+    Fastest known algorithm for closeness: \emph{All-Pair-Shortest Paths}
+    \begin{itemize}
+      \item Runtime: $O(nm+n^2\log n)$
+    \end{itemize}
+    \vfill
+    \pause
+    Too slow for \emph{web-scale} graphs!
+    \begin{itemize}
+      \item Later we'll discuss an \emph{approximation algorithm}
+    \end{itemize}
+    \vfill
+\end{frame}
+
+\begin{frame}
+  \centering
+  \vfill
+  {\huge A Faster Algorithm for Betweenness Centrality}
   \vfill
   {\Large U.~Brandes}
   \vfill
   {\large Journal of Mathematical Sociology (2001)}
   \vfill
+\end{frame}
+
+\begin{frame}
+  \frametitle{Why {\red faster}?}
+  \vfill
+  Let's take a step back. Recall the definition
+  \[
+    \sum_{\substack{s\neq x\neq t \in V\\s\neq t}}\frac{\sigma_{st}(x)}{\sigma_{st}}
+    \vspace{-10pt}
+  \]
+  \begin{itemize}
+    \item $\sigma_{st}$: no.~of SPs from $s$ to $t$
+    \item $\sigma_{st}(x)$: no.~of SPs from $s$ to $t$ that go through $x$
+  \end{itemize}
+  \pause
+  We could:
+  \begin{enumerate}
+    \item obtain all the $\sigma_{st}$ and $\sigma_{st}(x)$ for all $x$, $s$,
+      $t$ via APSP; and then
+    \item perform the aggregation to obtain $\betw(x)$ for all $x$.
+  \end{enumerate}
+  \pause
+  The first step takes $O(nm+n^2\log n)$, but the second step takes\ldots\pause
+  $\Theta(n^3)$ (a sum of $O(n^2)$ terms for each of the $n$ vertices).
+  \pause
+  \vfill
+  Brandes' algorithm interleaves the SP computation with the aggregation,
+  achieving runtime $O(nm+n^2\log n)$\\
+  \quad I.e., it is \emph{faster} than the APSP approach
+\end{frame}
+
+\begin{frame}
+  \frametitle{Dependencies}
+  Define: \emph{Dependency} of $s$ on $x$:
+  \[
+    \dep_s(v)=\sum_{t\neq s\neq v}\frac{\sigma_{st}(v)}{\sigma_{st}}
+  \]
+  Hence:
+  \[
+    \betw(v)=\sum_{s\neq v}\dep_s(v)
+  \]
+  \pause
+  Brandes proved that $\delta_s(v)$ obeys a \emph{recursive relation}:
+  \[
+    \dep_s(v)=\sum_{w:v\in\pred_s(w)}\frac{\sigma_{sv}}{\sigma_{sw}}\left(1+\dep_s(w)\right)
+  \]
+  We can leverage this relation for efficient computation of betweenness.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Recursive relation}
+  \begin{theorem}[Simpler form]
+    If there is exactly one SP from $s$ to each $t$, then
+    \[
+      \dep_s(v)=\sum_{w: v\in\pred_s(w)}\left(1+\dep_s(w)\right)
+    \]
+  \end{theorem}
+  \pause
+  \emph{Proof sketch:}
+  \begin{itemize}
+    \item The SP DAG from $s$ is a tree;
+    \item Fix $t$. $v$ is either on the single SP from $s$ to $t$ or not.
+    \item $v$ lies on all and only the SPs to vertices $w$ for which $v$ is a
+      predecessor (one SP for each $w$) and the SPs that these lie on. Hence the
+      thesis.
+  \end{itemize}
+  \pause
+  The general version must take into account that not all SPs from $s$ to $w$ go
+  trough $v$.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Brandes' Algorithm}
+  \begin{enumerate}
+    \item Initialize $\dep_s(v)$ to $0$ for each $v,s$ and $\betw(w)$ to $0$ for
+      each $w$.
+    \item Iterate the following loop for each node $s$:
+      \begin{enumerate}
+        \item Run Dijkstra's algorithm from $s$, keeping track of $\sigma_{sv}$ for
+          each encountered node $v$, and inserting the nodes in a max-heap $H$ by
+          distance from $s$;
+        \item While $H$ is not empty:
+          \begin{enumerate}
+            \item Pop the max node $t$ in $H$;
+            \item For each $w\in\pred_s(t)$, increment $\dep_s(w)$ by
+              $\frac{\sigma_{sw}}{\sigma_{st}}(1+\dep_s(t))$;
+            \item Increment $\betw(t)$ by $\dep_s(t)$;
+          \end{enumerate}
+      \end{enumerate}
+  \end{enumerate}
 \end{frame}
 
 \begin{frame}
@@ -40,7 +161,7 @@
   \vfill
   {\Large A.~E.~Sar\i y\"uce, E.~Saule, K.~Kaya, \"U.~V.~\c{C}ataly\"urek}
   \vfill
-  {\large SIAM Data Mining Conference (2013)}
+  {\large SDM '13: SIAM Conference on Data Mining}
   \vfill
 \end{frame}
 
