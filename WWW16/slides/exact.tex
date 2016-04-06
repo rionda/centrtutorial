@@ -1,20 +1,309 @@
 % !TEX root =  centrtutorial.tex
 
+\section{Exact Algorithms}
 \begin{frame}
-  \frametitle{Part 2}
+  \frametitle{Outline}
+  \begin{enumerate}
+    \item Exact algorithms for static graphs
+      \begin{enumerate}
+        \item the standard algorithm for closeness
+        \item the standard algorithm for betweenness
+        \item a practically faster algorithm through shattering and compression
+        \item a GPU-Based algorithm for betweenness
+      \end{enumerate}
+    \item Exact algorithms for dynamic graphs
+      \begin{enumerate}
+        \item a dynamic algorithm for closeness
+        \item four dynamic algorithms for betweenness
+        \item a parallel streaming algorithm for betweenness
+      \end{enumerate}
+  \end{enumerate}
+\end{frame}
+
+\subsection{Exact Algorithms for Static Graphs}
+
+\begin{frame}
   \centering
-  \Huge Exact Dynamic Algorithms
+  \vfill
+  {\Huge A Faster Algorithm for Betweenness Centrality}
+  \vfill
+  {\Large U.~Brandes}
+  \vfill
+  {\large Journal of Mathematical Sociology (2001)}
+  \vfill
+\end{frame}
+
+\begin{frame}
+  \centering
+  \vfill
+  {\huge Shattering and Compressing Networks for Betweenness Centrality}
+  \vfill
+  {\Large A.~E.~Sar\i y\"uce, E.~Saule, K.~Kaya, \"U.~V.~\c{C}ataly\"urek}
+  \vfill
+  {\large SIAM Data Mining Conference (2013)}
+  \vfill
+\end{frame}
+
+%\begin{frame}
+%  \frametitle{A Divide-and-Conquer Algorithm for Betweenness Centrality}
+%  \centering
+%  \vfill
+%  {\huge D.~Erd\H{o}s, V.~Ishakian, A.~Bestravros, E.~Terzi}
+%  \vfill
+%  {\large SIAM Data Mining Conference (2015)}
+%\end{frame}
+
+%% Sariyüce et al.
+\begin{frame}
+  \centering
+  \vfill
+  {\huge Betweenness Centrality on GPUs and Heterogeneous Architectures}
+  \vfill
+  {\Large A.~E.~Sar\i y\"uce, K.~Kaya, E.~Saule, \"U.~V.~\c{C}ataly\"urek}
+  \vfill
+  {\large GPGPU '13: Workshop on General Purpose Processing Using GPUs}
+  \vfill
+\end{frame}
+
+\begin{frame}
+  \frametitle{Parallelism}
+
+  \begin{itemize}
+    \item Fine grained: single concurrent BFS
+    \item Only one copy of auxiliary data structures
+    \item Synchronization needed
+    \item Better for GPUs, which have small memory
+  \end{itemize}
+  \begin{itemize}
+    \item Coarse grained: many independent BFSs
+    \item Sources are independent, embarrassingly parallel
+    \item More memory needed
+    \item Better for CPUs, which have large memory
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{GPU}
+
+  \begin{quote}
+    A GPU is especially well-suited to address problems that can be expressed as \textbf{data-parallel computations} - the same program is executed on many data elements in parallel - with \textbf{high arithmetic intensity} - the ratio of arithmetic operations to memory operations.
+
+    Because the same program is executed for each data element, there is a lower requirement for sophisticated flow control, and because it is executed on many data elements and has high arithmetic intensity, the memory access latency can be hidden with calculations instead of big data caches.\footnote{\url{http://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html}}
+  \end{quote}
 \end{frame}
 
 
+\begin{frame}
+  \frametitle{Execution model}
+  \begin{columns}[onlytextwidth]
+
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item One thread per data element
+        \item Thread scheduled in blocks with barriers (wait for others at the end)
+        \item Program runs on the whole data (kernel)
+      \end{itemize}
+      \begin{itemize}
+        \item Minimize synchronization
+        \item Balance load
+        \item Coalesce memory access
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+      \begin{figure}[t]
+        \centering
+        \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/cuda}
+      \end{figure}
+    \end{column}
+  \end{columns}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Intuition}
+
+  \begin{itemize}
+    \item GPUs have huge number of cores
+    \item Use them to parallelize BFS
+    \item One core per vertex, or one core per edge
+    \item Vertex-based parallelism creates load imbalance for graphs with skewed degree distribution
+    \item Edge-based parallelism requires high memory usage
+  \end{itemize}
+  \begin{itemize}
+    \item Use vertex-based parallelism
+    \item Virtualize high-degree nodes to address load imbalance
+    \item Reduce memory usage by removing predecessors lists
+  \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Difference}
+
+  \begin{columns}[onlytextwidth]
+    \begin{column}{0.5\textwidth}
+      \begin{figure}[t]
+        \centering
+        \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/gpu-vertex-bfs}
+        \caption{Vertex-based BFS}
+      \end{figure}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+      \begin{figure}[t]
+        \centering
+        \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/gpu-edge-bfs}
+        \caption{Edge-based BFS}
+      \end{figure}
+    \end{column}
+  \end{columns}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Vertex-based}
+
+  \begin{columns}[onlytextwidth]
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item For each level, for each vertex in parallel
+        \item If vertex is on level
+        \item For each neighbor, adjust \pred and \paths
+        \item Atomic update on \paths needed (multiple paths can be discovered concurrently)
+        \item While backtracking, if $u \in \pred(v)$ accumulate $\dep(u) = \dep(u) + \dep(v)$
+        \item Possible load imbalance if degree skewed
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+      \begin{figure}[t]
+        \centering
+        \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/gpu-algo-vertex}
+      \end{figure}
+    \end{column}
+  \end{columns}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Edge-based}
+
+  \begin{columns}[onlytextwidth]
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item For each level, for each edge in parallel
+        \item If edge endpoint is on level
+        \item Same as above...
+        \item While backtracking, if $u \in \pred(v)$ accumulate $\dep(u) = \dep(u) + \dep(v)$ \emph{atomically}
+        \item Multiple edges can try to update \dep concurrently
+        \item More memory (edge-based layout) \\ and more atomic operations
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+      \begin{figure}[t]
+        \centering
+        \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/gpu-algo-edge}
+      \end{figure}
+    \end{column}
+  \end{columns}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Vertex virtualization}
+
+  \begin{columns}[onlytextwidth]
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item AKA, edge packing/batching, \\ hybrid between vertex- and edge-based
+        \item Split high degree vertices into virtual ones with maximum degree $mdeg$
+        \item Equivalently, pack up to $mdeg$ edges belonging to the same vertex together
+        \item Very small $mdeg = 4$
+        \item Need additional auxiliary maps
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+      \begin{figure}[t]
+        \centering
+        \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/gpu-algo-hybrid}
+      \end{figure}
+    \end{column}
+  \end{columns}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Benefits}
+
+  \begin{itemize}
+    \item Compared to vertex-based:
+    \begin{itemize}
+      \item Reduce load imbalance
+    \end{itemize}
+    \item Compared to edge-based:
+    \begin{itemize}
+    \item Reduce number of atomic operations
+    \item Reduce memory footprint
+    \end{itemize}
+    \item Predecessors stored implicitly in the \spdag level (reduced memory usage)
+    \item Memory layout can be further optimized to coalesce latency via \emph{striding}:
+    \begin{itemize}
+      \item Distribute edges to virtual vertices in round-robin
+      \item When accessed in parallel, they create faster sequential memory access pattern
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Results}
+
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/gpu-results1}
+    \caption{Speedup over Brandes' on CPU on real graphs with 32-core GPU ($s= 1k, \ldots, 100k$)}
+  \end{figure}
+
+  \begin{itemize}
+    \item Results computed only on a sample of sources and extrapolated linearly
+  \end{itemize}
+\end{frame}
+
+
+%\begin{frame}
+%  \frametitle{Results}
+%
+%  \begin{figure}[t]
+%    \centering
+%    \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/gpu-results2}
+%    \caption{Speedup over Brandes' on CPU on real graphs with 32-core GPU}
+%  \end{figure}
+%
+%\end{frame}
+
+
+
+\subsection{Exact Algorithms for Dynamic Graphs}
+
 %% Green et al.
 \begin{frame}
-  \frametitle{A Fast Algorithm for Streaming Betweenness Centrality}
   \centering
   \vfill
-  {\huge O. Green, R. McColl, D. A. Bader}
+  {\huge A Fast Algorithm for Streaming Betweenness Centrality}
+  \vfill
+  {\Large O. Green, R. McColl, D. A. Bader}
   \vfill
   {\large SocialCom '12: International Conference on Social Computing}
+  \vfill
 \end{frame}
 
 
@@ -31,7 +320,7 @@
     \item Re-run parts of modified Brandes' algorithm on edge update
     \item Support only edge addition (on unweighted graphs)
   \end{itemize}
-    
+
 \end{frame}
 
 
@@ -53,14 +342,14 @@
       \item $dd > 1$ non-adjacent~level
     \end{itemize}
   \end{itemize}
-      
+
 \end{frame}
 
 
 \begin{frame}
   \frametitle{Same level addition}
   \begin{columns}[onlytextwidth]
-  
+
     \begin{column}{0.5\textwidth}
       \begin{itemize}
         \item $dd = 0$
@@ -68,7 +357,7 @@
         \item No change to betweenness \\ due to this source
       \end{itemize}
     \end{column}
-    
+
     \begin{column}{0.5\textwidth}
       \begin{figure}[t]
         \centering
@@ -76,14 +365,14 @@
       \end{figure}
     \end{column}
   \end{columns}
-  
+
 \end{frame}
 
 
 \begin{frame}
   \frametitle{Adjacent level addition}
   \begin{columns}[onlytextwidth]
-  
+
     \begin{column}{0.5\textwidth}
       \begin{itemize}
         \item $dd = 1$
@@ -95,7 +384,7 @@
         \item Example: $w$ and predecessors have now only $\sfrac{1}{2}$ of dependency on sub-dag rooted in $u_{low}$
       \end{itemize}
     \end{column}
-    
+
     \begin{column}{0.5\textwidth}
       \begin{figure}[t]
         \centering
@@ -103,14 +392,14 @@
       \end{figure}
     \end{column}
   \end{columns}
-    
+
 \end{frame}
 
 
 \begin{frame}
   \frametitle{Algorithm}
   \begin{columns}[onlytextwidth]
-  
+
     \begin{column}{0.3\textwidth}
       \begin{itemize}
         \item During exploration:
@@ -128,7 +417,7 @@
         \end{itemize}
       \end{itemize}
     \end{column}
-    
+
     \begin{column}{0.7\textwidth}
       \begin{figure}[t]
         \centering
@@ -143,9 +432,9 @@
 
 \begin{frame}
   \frametitle{Non-adjacent level addition}
-  
+
   \begin{columns}[onlytextwidth]
-  
+
     \begin{column}{0.5\textwidth}
       \begin{itemize}
         \item $dd > 1$
@@ -154,7 +443,7 @@
         \item Algorithm only sketched \\ (most details missing)
       \end{itemize}
     \end{column}
-    
+
     \begin{column}{0.5\textwidth}
       \begin{figure}[t]
         \centering
@@ -165,7 +454,7 @@
       \end{figure}
     \end{column}
   \end{columns}
-    
+
 \end{frame}
 
 
@@ -178,21 +467,21 @@
   \end{itemize}
   \begin{itemize}
     \item Space: $O(n^2 + nm)$ $\leftarrow$ higher than Brandes'
-    \item For each source, a \spdag of complexity $n + m$ 
+    \item For each source, a \spdag of complexity $n + m$
   \end{itemize}
-    
+
 \end{frame}
 
 
 \begin{frame}
   \frametitle{Results}
-  
+
   \begin{figure}[t]
     \centering
     \includegraphics[width=\textwidth, height=0.7\textheight, keepaspectratio]{imgs/green-results1}
     \caption{Speedup over Brandes' on synthetic graphs ($n = 4096$)}
   \end{figure}
-    
+
 \end{frame}
 
 
@@ -203,23 +492,25 @@
     \item Up to 2 orders of magnitude speedup
     \item Super-quadratic space bottleneck
   \end{itemize}
-    
+
 \end{frame}
 
 
 %% QUBE
 \begin{frame}
-  \frametitle{QUBE: a Quick Algorithm for Updating BEtweenness centrality}
   \centering
   \vfill
-  {\huge M. Lee, J. Lee, J. Park, R. Choi, C. Chung}
+  {\huge QUBE: a Quick Algorithm for Updating Betweenness centrality}
+  \vfill
+  {\Large M. Lee, J. Lee, J. Park, R. Choi, C. Chung}
   \vfill
   {\large WWW '12: International World Wide Web Conference}
+  \vfill
 \end{frame}
 
 \begin{frame}
   \frametitle{Intuition}
-  
+
   \begin{itemize}
     \item No need to update all vertices when a new edge is added
     \item Prune vertices whose \betw does not change
@@ -231,14 +522,14 @@
 
 \begin{frame}
   \frametitle{Minimum Cycle Basis}
-  
+
   \begin{itemize}
     \item $G=(V,E)$ undirected graph
     \item \emph{Cycle} $C \subseteq E$ s.t. $\forall v \in V$, $v$ incident to even number of edges in $C$
-    \item Represented as edge incidence vector $\nu \in \{ 0,1 \}^{|E|}$, where $\nu(e) = 1 \iff e \in C$ 
+    \item Represented as edge incidence vector $\nu \in \{ 0,1 \}^{|E|}$, where $\nu(e) = 1 \iff e \in C$
     \item \emph{Cycle Basis} = set of linearly independent cycles
     \item \emph{Minimum Cycle Basis} = on weighted graph with non-negative weights $w_e$, cycle basis of minimum total weight $w(C) = \sum_{i} w(C_i)$ where $w(C_i) = \sum_{e \in C_i} w_e$
-  \end{itemize}  
+  \end{itemize}
 \end{frame}
 
 
@@ -257,14 +548,14 @@
 
 \begin{frame}
   \frametitle{Minimum Union Cycle}
-  
+
   \begin{itemize}
     \item Given a MCB $C$ and minimum cycles $C_i \in C$
     \item Let $V_{C_i}$ be the set of vertices induced by $C_i$
     \item Recursively union two $V_{C_i}$ if they share at least one vertex
     \item The final set of vertices is a \emph{Minimum Union Cycle} $MUC$
   \end{itemize}
-  
+
   \begin{itemize}
     \item $MUC$s are disjoint sets of vertices
     \item $MUC(v)$ = the $MUC$ which contains vertex $v$
@@ -274,26 +565,26 @@
 
 \begin{frame}
   \frametitle{Connection Vertex}
-  
+
   \begin{itemize}
     \item \emph{Articulation Vertex} = vertex $v$ whose deletion makes the graph disconnected
     \item Biconnected graph = graph with no articulation vertex
     \item Vertex $v$ is an articulation vertex $\iff$ v belongs to two biconnected components
-  \end{itemize} 
-  
+  \end{itemize}
+
   \begin{itemize}
     \item \emph{Connection Vertex} = vertex $v$ that
     \begin{itemize}
       \item is an articulation vertex
       \item has an edge to vertex $w \not\in MUC(v)$
-    \end{itemize} 
+    \end{itemize}
   \end{itemize}
 \end{frame}
 
 
 \begin{frame}
   \frametitle{Connection Vertex Example}
-  
+
   \begin{columns}[onlytextwidth]
     \begin{column}{0.5\textwidth}
       \begin{itemize}
@@ -302,7 +593,7 @@
         \item Let $G_i$ be the disconnected subgraph generated by removing $v_i$
       \end{itemize}
     \end{column}
-    
+
     \begin{column}{0.5\textwidth}
       \begin{figure}[t]
         \centering
@@ -310,13 +601,13 @@
       \end{figure}
     \end{column}
   \end{columns}
-  
+
 \end{frame}
 
 
 \begin{frame}
   \frametitle{Finding MUCs}
-  
+
   \begin{itemize}
     \item Finding an $MCB$ is well studied
     \item Kavitha, Mehlhorn, Michail, Paluch. ``A faster algorithm for minimum cycle basis of graphs''. ICALP 2004
@@ -330,12 +621,12 @@
 
 \begin{frame}
   \frametitle{Updating MUCs -- Addition}
-  
+
   \begin{figure}[t]
     \centering
     \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/qube-addition}
   \end{figure}
-    
+
   \begin{itemize}
     \item Adding $a$ does not affect the $MUC$ (endpoints in the same $MUC$)
     \item Adding $b$ creates a new $MUC$ (endpoints do not belong to a $MUC$)
@@ -346,23 +637,23 @@
 
 \begin{frame}
   \frametitle{Updating MUCs -- Removal}
-  
+
   \begin{figure}[t]
     \centering
     \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/qube-removal}
   \end{figure}
-  
+
   \begin{itemize}
     \item Removing $a$ destroys the $MUC$ (cycle is removed $\rightarrow$ no biconnected component)
     \item Removing $b$ does not affect the $MUC$ ($MUC$ is still biconnected)
     \item Removing $c$ splits the $MUC$ in two (single vertex appears in all \spath between endpoints)
-  \end{itemize}    
+  \end{itemize}
 \end{frame}
 
 
 \begin{frame}
   \frametitle{Betweenness Centrality Dependency}
-  
+
   \begin{itemize}
     \item Only vertexes inside the $MUC$s of the updated endpoints need to be updated
     \item However, recomputing all centralities for the $MUC$ still requires new shortest paths to the rest of the graph
@@ -371,7 +662,7 @@
         \item Shortest paths that pass through the $MUC$
       \end{itemize}
   \end{itemize}
-  
+
   \begin{figure}[t]
     \centering
     \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/qube-btwmuc}
@@ -381,14 +672,14 @@
 
 \begin{frame}
   \frametitle{Betweenness Centrality outside the MUC}
-  
+
   \begin{itemize}
     \item Let $s \in V_{G_j}$, $t \in MUC$,
     \item Let $j \in MUC$ be a connection vertex to subgraph $G_j$
     \item Each vertex in $\spath_{jt}$ is also in $\spath_{st}$
-    \item Therefore, betweenness centrality due to vertices outside the $MUC$:    
+    \item Therefore, betweenness centrality due to vertices outside the $MUC$:
   \end{itemize}
-  
+
   \begin{align*}
     \large
     \betw_{o}(v) = \begin{cases}
@@ -401,13 +692,13 @@
 
 \begin{frame}
   \frametitle{Betweenness Centrality trough the MUC}
-  
+
   \begin{itemize}
     \item Let $s \in V_{G_j}$, $t \in V_{G_k}$,
     \item Let $j \in MUC$ be a connection vertex to subgraph $G_j$
     \item Let $k \in MUC$ be a connection vertex to subgraph $G_k$
     \item Each vertex in $\spath_{jk}$ is also in $\spath_{st}$
-    \item Therefore, betweenness centrality due to paths through the $MUC$:    
+    \item Therefore, betweenness centrality due to paths through the $MUC$:
   \end{itemize}
 
   \begin{align*}
@@ -416,21 +707,21 @@
       0 						& \text{ otherwise }
     \end{cases}
   \end{align*}
-  
+
   More caveats apply for subgraphs that are disconnected, as every path that connects vertices in different connected component passes through $v$
 \end{frame}
 
 
 \begin{frame}
   \frametitle{Updating Betweenness Centrality}
-  
+
   {\huge
   \begin{align*}
     \betw(v) = \betw_{MUC}(v) + \sum_{G_j \subset G} \betw_{o}(v) + \sum_{G_j, G_k \subset G} \betw_{x}(v)
   \end{align*}
   }
 \end{frame}
-  
+
 
 \begin{frame}
   \frametitle{QUBE algorithm}
@@ -447,7 +738,7 @@
 %        \includegraphics[width=\textwidth, height=\textheight, keepaspectratio]{imgs/qube-algorithm1}
 %      \end{figure}
 %    \end{column}
-    
+
 %    \begin{column}{0.5\textwidth}
 %      \begin{figure}[t]
 %        \centering
@@ -465,13 +756,13 @@
         \centering
         \includegraphics[width=\textwidth, height=\textheight, keepaspectratio]{imgs/qube-algorithm2}
       \end{figure}
-      
+
 \end{frame}
 
 
 \begin{frame}
   \frametitle{QUBE + Brandes}
-  
+
   \begin{itemize}
     \item QUBE is a pruning rule that reduces the search space for betweenness recomputation
     \item Can be paired with any existing betweenness algorithm to compute $\betw_{MUC}$
@@ -489,7 +780,7 @@
     \includegraphics[width=\textwidth, height=0.7\textheight, keepaspectratio]{imgs/qube-results1}
     \caption{Update time as a function of the percentage of vertices of the graph in the updated $MUC$ for synthetic Erd\"{o}s-R\'{e}nyi graphs ($n = 5000$)}
   \end{figure}
-    
+
 \end{frame}
 
 
@@ -500,29 +791,31 @@
     \centering
     \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/qube-results2}
   \end{figure}
-  
+
   \begin{itemize}
     \item Improvement depends highly on structure of the graph (bi-connectedness)
     \item From 2 orders of magnitude (best) to 2 times (worst) faster than Brandes'
   \end{itemize}
-    
+
 \end{frame}
 
 
 %% Kas et al.
 \begin{frame}
-  \frametitle{Incremental Algorithm for Updating Betweenness Centrality in Dynamically Growing Networks}
   \centering
   \vfill
-  {\huge M. Kas, M. Wachs, K. M. Carley, L. R. Carley}
+  {\huge Incremental Algorithm for Updating Betweenness Centrality in Dynamically Growing Networks}
+  \vfill
+  {\Large M. Kas, M. Wachs, K. M. Carley, L. R. Carley}
   \vfill
   {\large ASONAM '13: International Conference on Advances \\in Social Networks analysis and Mining}
+  \vfill
 \end{frame}
 
 
 \begin{frame}
   \frametitle{Intuition}
-  
+
   \begin{itemize}
     \item Extend an existing dynamic all-pairs shortest path algorithm to betweenness
     \item G. Ramalingam and T. Reps, ``\emph{On the Computational Complexity of Incremental Algorithms},'' CS, Univ. of Wisconsin at Madison, Tech. Report 1991
@@ -530,13 +823,13 @@
     \item Keep a copy of the old quantities while updating
     \item Support only edge addition (on weighted graphs)
   \end{itemize}
-    
+
 \end{frame}
 
 
 \begin{frame}
   \frametitle{Edge update}
-  
+
   \begin{itemize}
     \item Compute new shortest paths from updated endpoints $(u,v)$
     \item If a new shortest path of the same length is found, updated number of paths as
@@ -561,13 +854,13 @@
 
 \begin{frame}
   \frametitle{Edge update}
-  
+
   \begin{itemize}
     \item Complex bookkeeping: need to consider all affected vertices which have new alternative shortest paths of equal length (not covered in the original algorithm)
     \item Amend \pred during update propagation $\rightarrow$ concurrent changes to the \spdag
     \item Need to track now-unreachable nodes separately
   \end{itemize}
-  
+
   \begin{itemize}
     \item After having fixed \dist, \paths, \betw, increase \betw due to new paths
     \item Update needed $\forall s,t \in V$ affected by changes (tracked from previous phase)
@@ -588,7 +881,7 @@
   \begin{itemize}
     \item Speedup depends on topological characteristics (e.g., diameter, clust. coeff.)
   \end{itemize}
-    
+
 \end{frame}
 
 
@@ -605,31 +898,33 @@
     \item Datasets from the QUBE paper
     \item About 1 order of magnitude faster than QUBE
   \end{itemize}
-    
+
 \end{frame}
 
 
 %% Nasre et al.
 \begin{frame}
-  \frametitle{Betweenness Centrality -- Incremental and Faster}
   \centering
   \vfill
-  {\huge M. Nasre, M. Pontecorvi, V. Ramachandran}
+  {\huge Betweenness Centrality -- Incremental and Faster}
+  \vfill
+  {\Large M. Nasre, M. Pontecorvi, V. Ramachandran}
   \vfill
   {\large MFCS '14: Mathematical Foundations of Computer Science}
+  \vfill
 \end{frame}
 
 
 \begin{frame}
   \frametitle{Intuition}
-  
+
   \begin{itemize}
     \item Keep \spdag for each vertex
     \item Re-use information from \spdag of updated edge endpoints
     \item Adding new edges will \emph{not} make old edges part of a \spath
     \item Support only edge addition (on weighted graphs)
   \end{itemize}
-    
+
 \end{frame}
 
 
@@ -640,9 +935,9 @@
 %    \centering
 %    \includegraphics[width=0.5\textwidth]{imgs/npr14-main-result}
 %  \end{figure}
-  
+
   \begin{itemize}
-    \item Let $\displaystyle E^* = \bigcup_{e \in \allspath} e \subseteq E$ be the set of edges that are part of any shortest path 
+    \item Let $\displaystyle E^* = \bigcup_{e \in \allspath} e \subseteq E$ be the set of edges that are part of any shortest path
     \item Let $\displaystyle m^* = |E^*|$ and $\displaystyle \nu^* = \max_{v \in V} |\spdag_v|$ the maximum number of edges in shortest paths through any single vertex $v$
     \item $n < \nu^* < m^* < m$
     \item After incremental update, betweenness can be recomputed in
@@ -663,7 +958,7 @@
     \centering
     \includegraphics[width=\textwidth, trim={0 8cm 0 0}, clip]{imgs/npr14-lemmas}
   \end{figure}
-  
+
   \begin{itemize}
     \item Edge $(u,v) \not\in \spath_{xu} \, \wedge \, (u,v)\not\in \spath_{vx}$ as edge weights are positive
   \end{itemize}
@@ -677,7 +972,7 @@
     \centering
     \includegraphics[width=\textwidth, trim={0 0 0 3.5cm}, clip]{imgs/npr14-lemmas}
   \end{figure}
-  
+
   \begin{itemize}
     \item Updates to \paths and \dist in constant time
     \item Need to update \pred to complete \spdag update
@@ -692,7 +987,7 @@
     \centering
     \includegraphics[width=\textwidth]{imgs/npr14-algo3}
   \end{figure}
-  
+
   \begin{itemize}
     \item UN-changed $\rightarrow dd=0$, NUM-changed $\rightarrow dd=1$, WT-changed $\rightarrow dd>1$
   \end{itemize}
@@ -711,7 +1006,7 @@
 
 \begin{frame}
   \frametitle{Space-Efficient Variant $O(n^2)$}
-  
+
   \begin{itemize}
     \item Do not store the \spdag
     \item Store only $E^*$
@@ -750,12 +1045,14 @@
 
 %% Sariyuce et al. (incremental closeness)
 \begin{frame}
-  \frametitle{Incremental Algorithms for Closeness Centrality}
   \centering
   \vfill
-  {\huge A. E. Sar\i y\"uce, K. Kaya, E. Saule, U.~V.~\c{C}ataly\"urek }
+  {\huge Incremental Algorithms for Closeness Centrality}
+  \vfill
+  {\Large A. E. Sar\i y\"uce, K. Kaya, E. Saule, U.~V.~\c{C}ataly\"urek }
   \vfill
   {\large IEEE BigData '13: International Conference on Big Data}
+  \vfill
 \end{frame}
 
 
@@ -769,7 +1066,7 @@
     \item Reminder: closeness centrality
     \item $\displaystyle c_{\mathrm{clos}}(v)=\frac{1}{\displaystyle  \sum_{u \in V} d(u,v)}$
   \end{itemize}
-    
+
 \end{frame}
 
 
@@ -794,7 +1091,7 @@
     \centering
     \includegraphics[width=\textwidth]{imgs/sksc-cases}
   \end{figure}
-  
+
   \begin{itemize}
     \item Usual cases: $dd=0$, $dd=1$, $dd>1$
   \end{itemize}
@@ -868,7 +1165,7 @@
     \item Most edges are easy cases
   \end{itemize}
 \end{frame}
-    
+
 \begin{frame}
   \frametitle{Speedup}
 
@@ -881,5 +1178,193 @@
     \item Speedup of 2 orders of magnitude
     \item Mostly due to level pruning
     \item Biconnected decomposition and hybridization also give good speedups
+  \end{itemize}
+\end{frame}
+
+
+%% Kourtellis et al.
+\begin{frame}
+  \centering
+  \vfill
+  {\huge Scalable Online Betweenness Centrality in Evolving Graphs}
+  \vfill
+  {\Large N. Kourtellis, G. De-Francisci-Morales, F. Bonchi}
+  \vfill
+  {\large TKDE: IEEE Transactions on Knowledge and Data Engineering (2015)}
+  \frametitle{Scalable Online Betweenness Centrality in Evolving Graphs}
+  \vfill
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Intuition}
+
+  \begin{itemize}
+    \item Incremental, exact, space-efficient, out-of-core, parallel version of Brandes'
+    \item Handles edge addition and removal
+    \item Vertex and edge betweenness
+    \item Scalable to graphs with millions of nodes
+  \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Algorithm}
+
+  \begin{itemize}
+    \item Run a modified Brandes' on the initial graph
+    \item Keep track of \dist, \paths, \dep in a \spdag (no \pred)
+    \item On edge update, adjust the \spdag and update \betw
+  \end{itemize}
+
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/kdb-algo}
+  \end{figure}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Data structure}
+
+  \begin{itemize}
+    \item $\spdag_s$ for each source $s \in V$
+    \item \spdag contains \dist, \paths, \dep for each other vertex $t \in V$
+    \item No predecessors \pred, re-scan neighbors and use \dist to find them
+    \begin{itemize}
+      \item Save memory - space complexity $O(n^2)$
+      \item Fixed size data structure - efficient out-of-core management
+      \item Same time complexity $O(nm)$ - in practice, makes the algorithm faster
+    \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Pivot}
+
+  \begin{itemize}
+    \item When adding or removing an edge, consider $dd = |d_{su} - d_{sv}|$
+    \item Three cases: $dd=0$, $dd=1$, $dd>1$ (analogous to Green et al.)
+    \item Last case $dd>1$ hardest - structural changes in \spdag
+    \item Find \emph{pivots} to discover structural changes
+  \end{itemize}
+
+  \begin{definition}[Pivot]
+Let $s$ be the current source, let $\dist$ and $\dist'$ be the distance before and after an update, respectively, we define \emph{pivot} a vertex $p \mid \dist(s,p) = \dist'(s,p) \wedge \exists \, w \in \neighbors(p)$$: \dist(s,w)$$\neq$$\dist'(s,w)$.
+  \end{definition}
+
+  \begin{itemize}
+    \item Pivots' distance unchanged $\rightarrow$ use as starting points to correct distances
+  \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Finding pivots}
+
+  \begin{itemize}
+    \item Addition - pivots in sub-dag rooted in $u_L = v$
+    \item Nodes moved closer must be reachable from $u_L$
+    \item Can be found during exploration while fixing \paths
+  \end{itemize}
+  \begin{itemize}
+    \item Removal - pivots may be anywhere
+    \item Need one exploration to find them
+    \item Need separate exploration from found pivots to correct distances
+  \end{itemize}
+
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.5\textheight, keepaspectratio]{imgs/kdb-bfs}
+  \end{figure}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Structural changes}
+
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.5\textheight, keepaspectratio]{imgs/kdb-cases}
+  \end{figure}
+
+  \begin{itemize}
+    \item Consider $x \in \neighbors(y)$, $x$ can either be a sibling or a predecessor of $y$
+    \item Each case requires slightly different combination of corrections for \dist, \paths, \dep
+    \item $y$ is pivot in 1d, 2e, 2f
+    \item Removal for case 1d can be optimized (pivot $y$ is sibling of $x$)
+  \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Scalability}
+
+  \begin{itemize}
+    \item Out-of-core - stream \spdag from disk
+    \begin{itemize}
+      \item In-place update on disk to minimize writes
+    \end{itemize}
+    \item Columnar storage for \dist, \paths, \dep
+    \begin{itemize}
+      \item Read only \dist, skip rest if $dd=0$
+    \end{itemize}
+    \item Parallelization - coarse grained over $s$
+    \begin{itemize}
+      \item Implementation in MapReduce, amenable to Apache Storm/Flink/Spark
+    \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Results}
+
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/kdb-results1}
+    \caption{Speedup over Brandes' on synthetic and real graphs ($n = 10k$)}
+  \end{figure}
+
+  \begin{itemize}
+    \item In-memory (M-) version faster than out-of-core (D-)
+    \item Without predecessor (-O) always faster than with predecessors (-P)
+  \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Results}
+
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/kdb-results2}
+    \caption{Speedup over Brandes' for out-of-core version on synthetic and real graphs ($n = 1M$)}
+  \end{figure}
+
+  \begin{itemize}
+    \item Out-of-core version scales up to 1M nodes
+    \item Speedup up to 2 orders of magnitude
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Conclusions}
+
+  \begin{itemize}
+    \item Fully dynamic (addition and removal)
+    \item Algorithm can scale to graphs with realistic size
+    \item Ideal horizontal scalability
+    \item $O(n^2)$ space bottleneck
   \end{itemize}
 \end{frame}

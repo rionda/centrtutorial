@@ -70,6 +70,17 @@
   \end{frame}
 }
 
+\AtBeginSubsection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsubsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
+
 \newcommand{\purple}{\color{purple}}
 \newcommand{\black}{\color{black}}
 \newcommand{\green}{\color{green}}
@@ -147,9 +158,8 @@ Gianmarco De Francisci Morales\inst{3}\\ \and Matteo Riondato\inst{4}}
 %   - Axioms for centrality
 \include{exact}
 % Contains
-%   - Exact algorithms on static graphs
-%   - Exact algorithms on dynamic graphs
-\include{scalable}
+%   - Exact algorithms on static graphs (including GPU)
+%   - Exact algorithms on dynamic graphs (including streaming/parallel)
 % Contains
 %   - Scalable algorithms (e.g., GPU)
 \include{approx}
