@@ -138,14 +138,14 @@
   \begin{enumerate}
     \item Initialize $\dep_s(v)$ to $0$ for each $v,s$ and $\betw(w)$ to $0$ for
       each $w$.
-    \item Iterate the following loop for each node $s$:
+    \item Iterate the following loop for each vertex $s$:
       \begin{enumerate}
         \item Run Dijkstra's algorithm from $s$, keeping track of $\sigma_{sv}$ for
-          each encountered node $v$, and inserting the nodes in a max-heap $H$ by
+          each encountered vertex $v$, and inserting the vertices in a max-heap $H$ by
           distance from $s$;
         \item While $H$ is not empty:
           \begin{enumerate}
-            \item Pop the max node $t$ in $H$;
+            \item Pop the max vertex $t$ in $H$;
             \item For each $w\in\pred_s(t)$, increment $\dep_s(w)$ by
               $\frac{\sigma_{sw}}{\sigma_{st}}(1+\dep_s(t))$;
             \item Increment $\betw(t)$ by $\dep_s(t)$;
@@ -163,6 +163,141 @@
   \vfill
   {\large SDM '13: SIAM Conference on Data Mining}
   \vfill
+\end{frame}
+
+\begin{frame}
+  \frametitle{Intuition}
+  \emph{Observations:}
+  \begin{itemize}
+    \item There are vertices with predictable betweenness (e.g., 0, or equal to one
+      of their neighbors). We can remove them from the graph (\emph{compression})
+    \item Partitioning the (compressed) graph into small components allows for
+      faster SP computation (\emph{shattering})
+  \end{itemize}
+  \pause
+  \emph{Idea}:
+  We can iteratively compress \& shatter until we can't reduce the graph any
+  more.\\
+  \qquad Only at this point we run (a modified) Brandes's algorithm and then
+  aggregate the ``partial'' betweenness in different components.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Introductory definitions}
+  \vfill
+  \begin{itemize}
+    \item Graph $G=(V,E)$
+    \item \emph{Induced graph} by $V'\subseteq V$: $G_{V'}=(V', E'=V'\times V'\cap E)$
+    \pause
+    \item Neighborhood of a vertex $v$: $\neighbors(v)=\{u~:~(v,u)\in V\}$
+    \pause
+  \item \emph{Side vertex}: a vertex $v$ such that $G_{\neighbors(v)}$ is a clique
+    \pause
+  \item \emph{Identical vertices}: two vertices $u$ and $v$ such that either
+      $\neighbors(u)\neighbors(v)$ or
+      $\neighbors(u)\cup\{u\}=\neighbors(v)\cup\{v\}$
+  \end{itemize}
+  \vfill
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Compression}
+  \vfill
+  Empirical / Intuitive observations
+  \begin{itemize}
+    \item if $v$ has degree $1$, then $\betw(v)=0$
+    \item if $v$ is a side vertex, then $\betw(v)=0$
+    \item if $u$ and $v$ are identical, then $\betw(v)=\betw(w)$
+  \end{itemize}
+  \pause
+  \vfill
+  \emph{Compression}:
+  \begin{itemize}
+    \item remove degree-1 vertices and side vertices; and
+    \item merge identical vertices
+  \end{itemize}
+  \vfill
+\end{frame}
+
+\begin{frame}
+  \frametitle{Shattering}
+  \vfill
+  \begin{itemize}
+    \item \emph{Articulation vertex}: vertex $v$ whose deletion makes the graph disconnected
+    \item \emph{Bridge edge:} an edge $e$ such that $G'=(V,E\setminus\{e\})$ has
+      more components than $G$.
+  \end{itemize}
+  \pause
+  \vfill
+  \emph{Shattering}:
+  \begin{itemize}
+    \item remove bridge edges; and
+    \item split articulation vertices in two copies, one per resulting component
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Example of shattering and compression}
+  \begin{figure}
+    \includegraphics{figs/shatteringbadios.pdf}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Issues}
+  There are issues to take care of when iteratively compressing \& shattering:
+  \begin{block}{Example of issue}
+    A vertex may have degree 1 only after we removed another vertex: we can't
+    just remove and forget it, as its original betweenness was not 0.
+  \end{block}
+  \pause
+  \begin{block}{Example of issue}
+    When splitting an articulation vertex into component copies, we need to know,
+    for each copies , how many vertices in other components are reachable through
+    that vertex.
+  \end{block}
+  ... and more
+\end{frame}
+
+\begin{frame}
+  \frametitle{Solution}
+  (Sketch)
+  \begin{itemize}
+    \item When we remove a vertex $u$, one of its neighbors (or an identical vertex)
+      $v$ is elected as the representative for $u$ (and for all vertices that $u$
+      was a representative of.)
+    \item We adjust the (current) values of $\betw(v)$ and $\betw(u)$ to
+      appropriately take into account the removal of $u$\\
+      \qquad the details are too hairy for a talk\ldots
+    \item When splitting articulation vertices or removing bridges, similar
+      adjustments take place.
+    \item Brandes' algorithm is slightly modified to take the number of vertices
+      that a vertex represents into consideration when computing the
+      dependencies and the betweenness values.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Speedup}
+  ``org.'' is Brandes' algorithm, ``best'' is compress \& shatter
+  \begin{figure}
+    \includegraphics{figs/runtimebadios.pdf}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Composition of runtime}
+  \begin{itemize}
+    \item Preproc is the time needed to compress \& shatter, Phase 1 is SSSP,
+      Phase 2 is aggregation
+    \item Different column for different variants of the algorithm (e.g., only
+      compression of 1-degree vertices, only shattering of edges)
+    \item the lower the better
+  \end{itemize}
+  \begin{figure}
+    \includegraphics[width=0.9\textwidth]{figs/runtimesplitbadios.pdf}
+  \end{figure}
 \end{frame}
 
 %\begin{frame}
@@ -254,7 +389,7 @@
   \end{itemize}
   \begin{itemize}
     \item Use vertex-based parallelism
-    \item Virtualize high-degree nodes to address load imbalance
+    \item Virtualize high-degree vertices to address load imbalance
     \item Reduce memory usage by removing predecessors lists
   \end{itemize}
 
@@ -961,7 +1096,7 @@
     \end{align*}
   }
   \begin{itemize}
-    \item If a new \emph{shorter} shortest path to any node is found, update \dist, clear \paths
+    \item If a new \emph{shorter} shortest path to any vertex is found, update \dist, clear \paths
     \item Betweenness decreased if new shortest path found
     \item Edge betweenness updates backtrack via DFS over $\pred_s(t)$
   \end{itemize}
@@ -979,7 +1114,7 @@
   \begin{itemize}
     \item Complex bookkeeping: need to consider all affected vertices which have new alternative shortest paths of equal length (not covered in the original algorithm)
     \item Amend \pred during update propagation $\rightarrow$ concurrent changes to the \spdag
-    \item Need to track now-unreachable nodes separately
+    \item Need to track now-unreachable vertices separately
   \end{itemize}
 
   \begin{itemize}
@@ -1324,7 +1459,7 @@
     \item Incremental, exact, space-efficient, out-of-core, parallel version of Brandes'
     \item Handles edge addition and removal
     \item Vertex and edge betweenness
-    \item Scalable to graphs with millions of nodes
+    \item Scalable to graphs with millions of vertices
   \end{itemize}
 
 \end{frame}
@@ -1390,7 +1525,7 @@
 
   \begin{itemize}
     \item Addition - pivots in sub-dag rooted in $u_L = v$
-    \item Nodes moved closer must be reachable from $u_L$
+    \item vertices moved closer must be reachable from $u_L$
     \item Can be found during exploration while fixing \paths
   \end{itemize}
   \begin{itemize}
@@ -1473,7 +1608,7 @@
   \end{figure}
 
   \begin{itemize}
-    \item Out-of-core version scales up to 1M nodes
+    \item Out-of-core version scales up to 1M vertices
     \item Speedup up to 2 orders of magnitude
   \end{itemize}
 
