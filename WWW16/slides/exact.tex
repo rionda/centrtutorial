@@ -40,7 +40,7 @@
     \]
     \vfill
     \pause
-    Fastest known algorithm for closeness: \emph{All-Pair-Shortest Paths}
+    Fastest known algorithm for closeness: \emph{All-Pairs Shortest Paths}
     \begin{itemize}
       \item Runtime: $O(nm+n^2\log n)$
     \end{itemize}
@@ -73,8 +73,8 @@
     \vspace{-10pt}
   \]
   \begin{itemize}
-    \item $\sigma_{st}$: no.~of SPs from $s$ to $t$
-    \item $\sigma_{st}(x)$: no.~of SPs from $s$ to $t$ that go through $x$
+    \item $\sigma_{st}$: no.~of \spath (SPs) from $s$ to $t$
+    \item $\sigma_{st}(x)$: no.~of \spath from $s$ to $t$ that go through $x$
   \end{itemize}
   \pause
   We could:
@@ -95,7 +95,7 @@
 
 \begin{frame}
   \frametitle{Dependencies}
-  Define: \emph{Dependency} of $s$ on $x$:
+  Define: \emph{Dependency} of $s$ on $v$:
   \[
     \dep_s(v)=\sum_{t\neq s\neq v}\frac{\sigma_{st}(v)}{\sigma_{st}}
   \]
@@ -108,13 +108,13 @@
   \[
     \dep_s(v)=\sum_{w:v\in\pred_s(w)}\frac{\sigma_{sv}}{\sigma_{sw}}\left(1+\dep_s(w)\right)
   \]
-  We can leverage this relation for efficient computation of betweenness.
+  We can leverage this relation for efficient computation of betweenness
 \end{frame}
 
 \begin{frame}
   \frametitle{Recursive relation}
   \begin{theorem}[Simpler form]
-    If there is exactly one SP from $s$ to each $t$, then
+    If there is exactly one \spath from $s$ to each $t$, then
     \[
       \dep_s(v)=\sum_{w: v\in\pred_s(w)}\left(1+\dep_s(w)\right)
     \]
@@ -122,10 +122,10 @@
   \pause
   \emph{Proof sketch:}
   \begin{itemize}
-    \item The SP DAG from $s$ is a tree;
-    \item Fix $t$. $v$ is either on the single SP from $s$ to $t$ or not.
+    \item The \spdag from $s$ is a tree;
+    \item Fix $t$. $v$ is either on the single \spath from $s$ to $t$ or not.
     \item $v$ lies on all and only the SPs to vertices $w$ for which $v$ is a
-      predecessor (one SP for each $w$) and the SPs that these lie on. Hence the
+      predecessor (one \spath for each $w$) and the SPs that these lie on. Hence the
       thesis.
   \end{itemize}
   \pause
@@ -189,12 +189,12 @@
     \item Graph $G=(V,E)$
     \item \emph{Induced graph} by $V'\subseteq V$: $G_{V'}=(V', E'=V'\times V'\cap E)$
     \pause
-    \item Neighborhood of a vertex $v$: $\neighbors(v)=\{u~:~(v,u)\in V\}$
+    \item Neighborhood of a vertex $v$: $\neighbors(v)=\{u~:~(v,u)\in E\}$
     \pause
   \item \emph{Side vertex}: a vertex $v$ such that $G_{\neighbors(v)}$ is a clique
     \pause
   \item \emph{Identical vertices}: two vertices $u$ and $v$ such that either
-      $\neighbors(u)\neighbors(v)$ or
+      $\neighbors(u)=\neighbors(v)$ or
       $\neighbors(u)\cup\{u\}=\neighbors(v)\cup\{v\}$
   \end{itemize}
   \vfill
@@ -204,7 +204,7 @@
 \begin{frame}
   \frametitle{Compression}
   \vfill
-  Empirical / Intuitive observations
+  Empirical / intuitive observations
   \begin{itemize}
     \item if $v$ has degree $1$, then $\betw(v)=0$
     \item if $v$ is a side vertex, then $\betw(v)=0$
@@ -225,14 +225,14 @@
   \vfill
   \begin{itemize}
     \item \emph{Articulation vertex}: vertex $v$ whose deletion makes the graph disconnected
-    \item \emph{Bridge edge:} an edge $e$ such that $G'=(V,E\setminus\{e\})$ has
-      more components than $G$.
+    \item \emph{Bridge edge:} an edge $e=(u,v)$ such that $G'=(V,E\setminus\{e\})$ has
+      more components than $G$ ($u$ and $v$ are articulation vertexes)
   \end{itemize}
   \pause
   \vfill
   \emph{Shattering}:
   \begin{itemize}
-    \item remove bridge edges; and
+    \item remove bridge edges
     \item split articulation vertices in two copies, one per resulting component
   \end{itemize}
 \end{frame}
@@ -246,7 +246,7 @@
 
 \begin{frame}
   \frametitle{Issues}
-  There are issues to take care of when iteratively compressing \& shattering:
+  Issues to take care of when iteratively compressing \& shattering:
   \begin{block}{Example of issue}
     A vertex may have degree 1 only after we removed another vertex: we can't
     just remove and forget it, as its original betweenness was not 0.
@@ -254,10 +254,10 @@
   \pause
   \begin{block}{Example of issue}
     When splitting an articulation vertex into component copies, we need to know,
-    for each copies , how many vertices in other components are reachable through
+    for each copy, how many vertices in other components are reachable through
     that vertex.
   \end{block}
-  ... and more
+  ...and more
 \end{frame}
 
 \begin{frame}
@@ -266,15 +266,15 @@
   \begin{itemize}
     \item When we remove a vertex $u$, one of its neighbors (or an identical vertex)
       $v$ is elected as the representative for $u$ (and for all vertices that $u$
-      was a representative of.)
+      was a representative of)
     \item We adjust the (current) values of $\betw(v)$ and $\betw(u)$ to
       appropriately take into account the removal of $u$\\
       \qquad the details are too hairy for a talk\ldots
     \item When splitting articulation vertices or removing bridges, similar
-      adjustments take place.
+      adjustments take place
     \item Brandes' algorithm is slightly modified to take the number of vertices
       that a vertex represents into consideration when computing the
-      dependencies and the betweenness values.
+      dependencies and the betweenness values
   \end{itemize}
 \end{frame}
 
@@ -344,7 +344,7 @@
   \begin{quote}
     A GPU is especially well-suited to address problems that can be expressed as \textbf{data-parallel computations} - the same program is executed on many data elements in parallel - with \textbf{high arithmetic intensity} - the ratio of arithmetic operations to memory operations.
 
-    Because the same program is executed for each data element, there is a lower requirement for sophisticated flow control, and because it is executed on many data elements and has high arithmetic intensity, the memory access latency can be hidden with calculations instead of big data caches.\footnote{\url{http://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html}}
+    Because the same program is executed for each data element, there is a lower requirement for sophisticated flow control, and because it is executed on many data elements and has high arithmetic intensity, the memory access latency can be hidden with calculations instead of big data caches.\footnote{\url{docs.nvidia.com/cuda/cuda-c-programming-guide/index.html}}
   \end{quote}
 \end{frame}
 
@@ -428,7 +428,7 @@
       \begin{itemize}
         \item For each level, for each vertex in parallel
         \item If vertex is on level
-        \item For each neighbor, adjust \pred and \paths
+        \item For each neighbor, \\ adjust \pred and \paths
         \item Atomic update on \paths needed (multiple paths can be discovered concurrently)
         \item While backtracking, if $u \in \pred(v)$ accumulate $\dep(u) = \dep(u) + \dep(v)$
         \item Possible load imbalance if degree skewed
@@ -457,7 +457,7 @@
         \item Same as above...
         \item While backtracking, if $u \in \pred(v)$ accumulate $\dep(u) = \dep(u) + \dep(v)$ \emph{atomically}
         \item Multiple edges can try to update \dep concurrently
-        \item More memory (edge-based layout) \\ and more atomic operations
+        \item More memory (edge-based layout) and more atomic operations
       \end{itemize}
     \end{column}
 
@@ -478,7 +478,7 @@
   \begin{columns}[onlytextwidth]
     \begin{column}{0.5\textwidth}
       \begin{itemize}
-        \item AKA, edge packing/batching, \\ hybrid between vertex- and edge-based
+        \item AKA, edge batching, \\ hybrid between vertex- and edge-based
         \item Split high degree vertices into virtual ones with maximum degree $mdeg$
         \item Equivalently, pack up to $mdeg$ edges belonging to the same vertex together
         \item Very small $mdeg = 4$
@@ -753,7 +753,7 @@
 \begin{frame}
   \centering
   \vfill
-  {\huge QUBE: a Quick Algorithm for Updating Betweenness centrality}
+  {\huge QUBE: a Quick algorithm for Updating BEtweenness centrality}
   \vfill
   {\Large M. Lee, J. Lee, J. Park, R. Choi, C. Chung}
   \vfill
@@ -1603,7 +1603,9 @@
 
   \begin{figure}[t]
     \centering
-    \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/kdb-results2}
+    \includegraphics[width=\textwidth, height=0.3\textheight, keepaspectratio]{imgs/kdb-results21}
+    \\ \qquad \quad
+    \includegraphics[width=\textwidth, height=0.3\textheight, keepaspectratio]{imgs/kdb-results22}
     \caption{Speedup over Brandes' for out-of-core version on synthetic and real graphs ($n = 1M$)}
   \end{figure}
 

@@ -35,10 +35,10 @@
     \item Social network analysis is the study of social entities and their interactions and relationships.
       \pause \item The interactions and relationships can be represented with a network or graph,
       \begin{itemize}
-        \pause  \item each vertex (or vertex) represents an actor and
-        \pause  \item each link represents a relationship.
+        \pause  \item each vertex represents an actor
+        \pause  \item each link represents a relationship
     \end{itemize}
-    \pause \item From the network, we can study the properties of its structure,
+    \pause \item From the graph, we can study the properties of its structure,
     and the \emph{role}, \emph{position}, and \emph{prestige} of each social entity.
     \pause\item We can also find various kinds of sub-graphs, e.g., \emph{communities} formed by groups of entities.
 \end{itemize}
@@ -49,15 +49,15 @@
 \frame{
   \frametitle{Centrality in networks}
   \begin{itemize}
-    \item Important or prominent actors are those that are linked or involved with other actors extensively.
-      \pause \item A person with extensive contacts (links) or communications with many other people in the organization is considered more important than a person with relatively fewer contacts.
-      \pause \item A Central actor is one involved in many ties.
-      \pause \item \emph{Graph centrality} is a topic of uttermost importance in \emph{social sciences}.
+    \item Important or prominent actors are those that are linked or involved with other actors extensively
+      \pause \item A person with extensive contacts (links) or communications with many other people in the organization is considered more important than a person with relatively fewer contacts
+      \pause \item A central actor is one involved in many ties
+      \pause \item \emph{Graph centrality} is a topic of uttermost importance in \emph{social sciences}
       \pause \item Also related to the problem of \emph{ranking} in the context of \emph{Web Search}:
       \begin{itemize}
-        \item Each webpage is a social actor and
-        \item each hyperlink is an endorsement relationship.
-        \item Centrality measures provide a query independent link-based score of \emph{importance} of a web page.
+        \item Each webpage is a social actor
+        \item Each hyperlink is an endorsement relationship
+        \item Centrality measures provide a query independent link-based score of \emph{importance} of a web page
       \end{itemize}
   \end{itemize}
 
@@ -95,7 +95,7 @@
     \pause\item the vertex that is closest to the other vertexes (e.g., that has the smallest average distance to other vertexes);
     \pause\item the vertex through which most shortest paths pass;
     \pause\item the vertex with the largest number of incoming paths of length $k$, for every $k$;
-    \pause\item the vertex that maximizes the dominant eigenvector of the graph matrix;
+    \pause\item the vertex that maximizes the dominant eigenvector of the graph adjacency matrix;
     \pause\item the vertex with highest probability in the stationary distribution of the natural random walk on the graph.
 \end{enumerate}
 \pause These observations lead to corresponding competing views of centrality.
@@ -187,7 +187,7 @@
 
   Definition:
   \begin{itemize}
-    \item closeness centrality $\closeness(x)$ of a  user $x$
+    \item closeness centrality $\closeness(x)$ of a vertex $x$
       $$
       \closeness(x)=\frac{1}{\sum_{y \neq x \in V}d(y,x).}
       $$
@@ -212,7 +212,7 @@
     \begin{column}{55mm}
       Definition:
       \begin{itemize}
-        \item  betweenness centrality $\betw(x)$ of a user $x$:
+        \item  betweenness centrality $\betw(x)$ of a vertex $x$:
           \[
             \betw(x)=\sum_{\substack{s\neq x\neq t \in V\\s\neq t}}
             \frac{\sigma_{st}(x)}{\sigma_{st}}
