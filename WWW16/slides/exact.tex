@@ -656,7 +656,7 @@
   \frametitle{Algorithm}
   \begin{columns}[onlytextwidth]
 
-    \begin{column}{0.3\textwidth}
+    \begin{column}{0.5\textwidth}
       \begin{itemize}
         \item During exploration:
           \begin{itemize}
@@ -665,6 +665,8 @@
             \item Enqueue for further processing
           \end{itemize}
       \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
       \begin{itemize}
         \item During backtracking:%
           \begin{itemize}
@@ -673,16 +675,13 @@
           \end{itemize}
       \end{itemize}
     \end{column}
-
-    \begin{column}{0.7\textwidth}
+  \end{columns}
       \begin{figure}[t]
         \centering
         %        \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/green-algo}
-        \includegraphics[width=0.45\textwidth, height=0.8\textheight, keepaspectratio, valign=t]{imgs/green-algo1}
-        \includegraphics[width=0.6\textwidth, height=0.8\textheight, keepaspectratio, valign=t]{imgs/green-algo2}
+        \includegraphics[width=0.45\textwidth, height=0.6\textheight, keepaspectratio, valign=t]{imgs/green-algo1}
+        \includegraphics[width=0.6\textwidth, height=0.6\textheight, keepaspectratio, valign=t]{imgs/green-algo2}
       \end{figure}
-    \end{column}
-  \end{columns}
 \end{frame}
 
 
@@ -704,8 +703,6 @@
       \begin{figure}[t]
         \centering
         \includegraphics<1>[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/green-2lvl-before-compressed}
-        \transdissolve<2>
-        \transduration{2}
         \includegraphics<2>[width=\textwidth, height=0.8\textheight, keepaspectratio]{imgs/green-2lvl-after-compressed}
       \end{figure}
     \end{column}
@@ -880,7 +877,7 @@
 
   \begin{figure}[t]
     \centering
-    \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/qube-addition}
+    \includegraphics[width=\textwidth, height=0.5\textheight, keepaspectratio]{imgs/qube-addition}
   \end{figure}
 
   \begin{itemize}
@@ -896,7 +893,7 @@
 
   \begin{figure}[t]
     \centering
-    \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{imgs/qube-removal}
+    \includegraphics[width=\textwidth, height=0.5\textheight, keepaspectratio]{imgs/qube-removal}
   \end{figure}
 
   \begin{itemize}
@@ -971,7 +968,7 @@
 \begin{frame}
   \frametitle{Updating Betweenness Centrality}
 
-  {\huge
+  {\Large
     \begin{align*}
       \betw(v) = \betw_{MUC}(v) + \sum_{G_j \subset G} \betw_{o}(v) + \sum_{G_j, G_k \subset G} \betw_{x}(v)
     \end{align*}
@@ -1245,7 +1242,9 @@
   \end{figure}
 
   \begin{itemize}
-    \item UN-changed $\rightarrow dd=0$, NUM-changed $\rightarrow dd=1$, WT-changed $\rightarrow dd>1$
+    \item UN-changed $\rightarrow dd=0$
+    \item NUM-changed $\rightarrow dd=1$
+    \item WT-changed $\rightarrow dd>1$
   \end{itemize}
 \end{frame}
 
@@ -1320,7 +1319,7 @@
     \item Additional pruning by bi-connected decomposition (similar to QUBE)
     \item Applied to closeness centrality (still solves APSP)
     \item Reminder: closeness centrality
-    \item $\displaystyle c_{\mathrm{clos}}(v)=\frac{1}{\displaystyle  \sum_{u \in V} d(u,v)}$
+    \item $\displaystyle \closeness(v)=\frac{1}{\displaystyle  \sum_{u \in V} d(u,v)}$
   \end{itemize}
 
 \end{frame}
@@ -1574,7 +1573,8 @@
       \end{itemize}
     \item Parallelization - coarse grained over $s$
       \begin{itemize}
-        \item Implementation in MapReduce, amenable to Apache Storm/Flink/Spark
+        \item Implementation in MapReduce
+        \item Amenable to Apache Storm/Flink/Spark
       \end{itemize}
   \end{itemize}
 

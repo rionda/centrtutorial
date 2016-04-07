@@ -1,3 +1,4 @@
+% !TEX root =  centrtutorial.tex
 %---------------------------------------------------------------------- SLIDE -
 
 \frame{
@@ -16,7 +17,6 @@
       \end{itemize}
     \item Approximation algorithms
       \begin{itemize}
-        \item exact algorithms on static graphs
         \item approximation algorithms on static graphs
         \item approximation algorithms on dynamic graphs
       \end{itemize}
@@ -35,7 +35,7 @@
     \item Social network analysis is the study of social entities and their interactions and relationships.
       \pause \item The interactions and relationships can be represented with a network or graph,
       \begin{itemize}
-        \pause  \item each vertex (or node) represents an actor and
+        \pause  \item each vertex (or vertex) represents an actor and
         \pause  \item each link represents a relationship.
     \end{itemize}
     \pause \item From the network, we can study the properties of its structure,
@@ -89,14 +89,14 @@
 
 \frame{
   \frametitle{Types of centralities}
-  Starting point: the central node of a star is the most important! Why?
+  Starting point: the central vertex of a star is the most important! Why?
   \begin{enumerate}
-    \pause\item the node with largest degree;
-    \pause\item the node that is closest to the other nodes (e.g., that has the smallest average distance to other nodes);
-    \pause\item the node through which most shortest paths pass;
-    \pause\item the node with the largest number of incoming paths of length $k$, for every $k$;
-    \pause\item the node that maximizes the dominant eigenvector of the graph matrix;
-    \pause\item the node with highest probability in the stationary distribution of the natural random walk on the graph.
+    \pause\item the vertex with largest degree;
+    \pause\item the vertex that is closest to the other vertexes (e.g., that has the smallest average distance to other vertexes);
+    \pause\item the vertex through which most shortest paths pass;
+    \pause\item the vertex with the largest number of incoming paths of length $k$, for every $k$;
+    \pause\item the vertex that maximizes the dominant eigenvector of the graph matrix;
+    \pause\item the vertex with highest probability in the stationary distribution of the natural random walk on the graph.
 \end{enumerate}
 \pause These observations lead to corresponding competing views of centrality.
 }
@@ -128,7 +128,7 @@
     $c_{\mathrm{clos}}(x)=\closeness(x)=\frac1{\sum_y d(y,x)}$
     \pause\item \emph{Lin} (Lin, 1976):
     $c_{\mathrm{Lin}}(x)=\frac{r(x)^2}{\sum_y d(y,x)}$ where $r(x)$ is the
-    number of nodes that are co-reachable from $x$
+    number of vertexes that are co-reachable from $x$
     \pause\item \emph{harmonic} (Boldi, Vigna, 2013)
     $c_{\mathrm{harm}}(x)=\sum_{y\neq x}\frac1{d(y,x)}$
 \end{itemize}
@@ -182,18 +182,18 @@
 
   Motivation
   \begin{itemize}
-    \item Measures the ability to quickly access or pass information through the network.
+    \item Measures the ability to quickly access or pass information through the graph
   \end{itemize}
 
   Definition:
   \begin{itemize}
-    \item closeness centrality $C(x)$ of a  user $x$
+    \item closeness centrality $\closeness(x)$ of a  user $x$
       $$
-      C(i)=1/\sum_{y\neq x \in V}d(y,x).
+      \closeness(x)=\frac{1}{\sum_{y \neq x \in V}d(y,x).}
       $$
       %\item \footnotesize
-    \item $d(y,x)$ is the length of a shortest path between nodes $y$ and $x$.
-    \item The closeness of a node is defined as the inverse of the sum of the shortest distances between the node and all other nodes of the network.
+    \item $d(y,x)$ is the length of a shortest path between $y$ and $x$
+    \item The closeness of a vertex is defined as the inverse of the sum of the shortest distances between the vertex and all other vertexes of the graph
   \end{itemize}
 }
 
@@ -205,7 +205,7 @@
   Motivation
   \begin{itemize}
     \item Measures the frequency with which a user appears in a shortest
-      path between two other users.
+      path between two other users
   \end{itemize}
 
   \begin{columns}[T]
@@ -218,8 +218,8 @@
             \frac{\sigma_{st}(x)}{\sigma_{st}}
           \]
         \item[\footnotesize $\sigma_{st}$]:  number of different shortest paths
-          between nodes $s$ \& $t$
-        \item[\footnotesize $\sigma_{st}(x)$:] how many of them pass through node $x$
+          between vertexes $s$ \& $t$
+        \item[\footnotesize $\sigma_{st}(x)$:] how many of them pass through vertex $x$
       \end{itemize}
     \end{column}
     \begin{column}{45mm}
@@ -233,8 +233,9 @@
 \frame{
   \frametitle{Betweenness centrality}
   \begin{itemize}
-    \item Can be defined also for edges (similarly to nodes)
-    \item Edges with high betweenness are what the sociologists call \emph{``weak ties''}. They tends to be the \emph{bridge} between two communities.
+    \item Can be defined also for edges (similarly to vertexes)
+    \item Edges with high betweenness are what sociologists call \emph{``weak ties''}
+    \item They tend to be the \emph{bridge} between two communities
   \end{itemize}
 
   \begin{columns}[T]
@@ -242,7 +243,7 @@
       \emph{The strength of weak ties (Granovetter 1973)}
       \begin{small}
         \begin{itemize}
-          \item Dissemination and coordination dynamics are influenced by links established to nodes of different communities.
+          \item Dissemination and coordination dynamics are influenced by links established to vertexes of different communities.
           \item The importance of these links has become more and more with the rise of social networks and professional networking platforms.
         \end{itemize}
       \end{small}
@@ -304,7 +305,7 @@
 %---------------------------------------------------------------------- SLIDE -
 \frame{
   \frametitle{Comparison}
-  \begin{block}{Which node is the most central?}
+  \begin{block}{Which vertex is the most central?}
     \begin{itemize}
       \item for Degree Centrality:
       \item for Closeness Centrality:
@@ -317,7 +318,7 @@
 
 \frame{
   \frametitle{Comparison}
-  \begin{block}{Which node is the most central?}
+  \begin{block}{Which vertex is the most central?}
     \begin{itemize}
       \item for Degree Centrality:  {\color{blue}  user A}
       \item for Closeness Centrality:
@@ -330,7 +331,7 @@
 
 \frame{
   \frametitle{Comparison}
-  \begin{block}{Which node is the most central?}
+  \begin{block}{Which vertex is the most central?}
     \begin{itemize}
       \item for Degree Centrality: {\color{blue}  user A}
       \item for Closeness Centrality: {\color{blue}  users B and C}
@@ -343,7 +344,7 @@
 
 \frame{
   \frametitle{Comparison}
-  \begin{block}{Which node is the most central?}
+  \begin{block}{Which vertex is the most central?}
     \begin{itemize}
       \item for Degree Centrality: {\color{blue}  user A}
       \item for Closeness Centrality: {\color{blue}  users B and C}
@@ -396,10 +397,10 @@
 
   $S_{k,p}$ be the union of a $k$-clique and a $p$-cycle.
   \begin{itemize}
-    \item if $k\to\infty$, every node of the clique becomes ultimately
-      strictly more important than every node of the cycle
-    \item if $p\to\infty$, every node of the cycle becomes ultimately
-      strictly more important than every node of the clique
+    \item if $k\to\infty$, every vertex of the clique becomes ultimately
+      strictly more important than every vertex of the cycle
+    \item if $p\to\infty$, every vertex of the cycle becomes ultimately
+      strictly more important than every vertex of the clique
   \end{itemize}
 
   \medskip
@@ -415,8 +416,8 @@
   $D_{k,p}$ be made by a $k$-clique and a $p$-cycle connected by a single
   bidirectional bridge:
   \begin{itemize}
-    \item if $k\to\infty$, the node on the clique-side of the bridge
-      becomes more important than the node on the cycle-side.
+    \item if $k\to\infty$, the vertex on the clique-side of the bridge
+      becomes more important than the vertex on the cycle-side.
   \end{itemize}
 
   \medskip
@@ -427,23 +428,23 @@
 %---------------------------------------------------------------------- SLIDE -
 \frame{
   \frametitle{Score monotonicity}
-  Adding an arc $x \to y$ strictly increases the score of $y$.
+  Adding an edge $x \to y$ strictly increases the score of $y$.
 
   \smallskip
-  \pause {\bf Doesn't say anything about the score of other nodes!}
+  \pause {\bf Doesn't say anything about the score of other vertexes!}
 }
 
 %---------------------------------------------------------------------- SLIDE -
 \frame{
   \frametitle{Rank monotonicity}
-  Adding an arc $x \to y$\dots
+  Adding an edge $x \to y$\dots
   \begin{itemize}
     \pause\item if $y$ used to dominate $z$, then the same holds after adding
-    the arc
+    the edge
     \pause\item if $y$ had the same score as $z$, then the same holds after
-    adding the arc
+    adding the edge
     \pause\item {\bf strict variant: } if $y$ had the same score as $z$, then $y$
-    dominates $z$ after adding the arc
+    dominates $z$ after adding the edge
 \end{itemize}
 }
 
