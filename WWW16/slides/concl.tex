@@ -1,0 +1,159 @@
+\section{Conclusions}
+
+%---------------------------------------------------------------------- SLIDE -
+\frame{
+  \frametitle{What we presented}
+
+  \begin{itemize}
+  \pause  \item Brief survey of the most common measures of centrality
+  \pause  \item Axioms for centrality
+  \pause  \item Focussing on closeness and betweenness centrality:
+  \begin{itemize}
+  \pause \item exact algorithms on static graphs
+  \pause \item exact algorithms on dynamic graphs (streaming, on-line, ...)
+  \pause \item approximated algorithms
+  \pause \item GPU-based algorithms
+  \end{itemize}
+    \end{itemize}
+  }
+
+%---------------------------------------------------------------------- SLIDE -
+\frame{
+  \frametitle{Future work}
+  \begin{itemize}
+  \pause  \item  A
+  \pause \item B
+    \pause  \item C
+  \pause \item D
+    \pause  \item X
+  \pause \item Y
+  \end{itemize}
+  }
+
+
+%---------------------------------------------------------------------- SLIDE -
+
+\frame{
+  \frametitle{Big Graphs}
+  \begin{itemize}
+  \pause  \item  \emph{``Big Data''} is a lot of hype and refers to very different things depending on the context.
+  \pause \item However, the unprecedent \emph{volume}, \emph{velocity}, and \emph{variety} pose real algorithmic challenges, especially when dealing with expressive and complex representations such as graphs.
+
+    \pause  \item Challenges are opportunities for researchers!
+  \pause \item Big graphs require new algorithms
+  \end{itemize}
+  }
+
+%---------------------------------------------------------------------- SLIDE -
+\frame{
+  \frametitle{Volume requires new algorithms}
+  \begin{itemize}
+  \pause  \item  Classic computational complexity:
+\begin{itemize}
+  \pause  \item It exists a polynomial time exact algorithm $\mathbf{\rightarrow}$ go for it!
+\pause  \item Your problem is \textbf{NP}-Hard $\mathbf{\rightarrow}$ better think about approximated algorithms...
+  \end{itemize}
+ \pause  \item Classic computational complexity: polynomial = feasible
+ \pause  \item But is polynomial time really feasible?
+ \begin{itemize}
+  \pause  \item E.g., Brandes algorithm not feasible for $n = 10^9$
+  \end{itemize}
+  \pause  \item On big graphs quadratic time is as bad as \textbf{NP}-Hard
+\begin{itemize}
+  \pause  \item New, finer-grain, complexity theory needed (?)
+ \end{itemize}
+ \pause  \item Need for \emph{massively parallel} algorithms, \emph{out-of-core} algorithms, \emph{sublinear} algorithms, \emph{approximated} algorithms, \emph{randomized} algorithms, etc.
+  \end{itemize}
+  }
+
+%---------------------------------------------------------------------- SLIDE -
+
+\frame{
+  \frametitle{Velocity requires new algorithms}
+  \begin{itemize}
+  \pause  \item  The velocity with which new data keeps \emph{arriving}...
+  \pause  \item ... and the velocity with which the information of interest keeps \emph{changing}.
+
+  \medskip
+
+  \pause  \item In the case of graphs new edges are formed and old edges might disappear at very high speed.
+\begin{itemize}
+  \pause  \item How to maintain the centrality score of all vertices continuously updated?
+\end{itemize}
+
+\medskip
+
+\pause  \item Velocity requires \emph{streaming} algorithms that only read each data point once (or a few time), specialized small-space data structures (\emph{sketches}) that maintain basic statistics and can be updated on-the-fly, algorithms which are \emph{robust to changes} in the data, etc.
+
+\end{itemize}
+
+}
+
+%---------------------------------------------------------------------- SLIDE -
+
+\frame{
+  \frametitle{Variety requires new algorithms}
+  \begin{itemize}
+\pause  \item Variety refers to the richness of different information types to be mixed in the analysis.
+
+\medskip
+
+\pause  \item Examples in graphs:
+\begin{itemize}
+\pause  \item Vertices have attributes;
+\pause  \item Vertices are spatiotemporally localized and keeps moving;
+\pause  \item Edges have types (colors);
+\pause  \item Edges have multiple types (a.k.a. multigraphs, multiplex networks, multidimensional networks, etc.);
+ \pause  \item Each edge has associated a timeserie representing the amount of communication (or activity) along the edge per time unit;
+\pause  \item ...
+\end{itemize}
+
+\medskip
+
+\pause  \item Semantic richness in the data implies complexity in the knowledge we can extract.
+ \pause  \item Applications involving ``multi-structured'' data require the definition of \emph{new, ad-hoc, model and patterns} ...
+\pause  \item ... and of course, the \emph{algorithms} to extract them,
+\pause  \item and these new algorithms need to be able to deal with the volume and the velocity!
+\end{itemize}
+}
+%---------------------------------------------------------------------- SLIDE -
+
+\frame{
+  \frametitle{Big Graphs}
+  The computational complexity of most existing graph
+algorithms makes them impractical in nowadays massive, information-rich,
+and dynamic networks. In order to scale graph analysis
+to real-world applications and to keep up with their
+highly dynamic nature, we need to devise new approaches
+specifically tailored for modern parallel stream
+processing engines that run on clusters of shared-nothing
+commodity hardware.
+  }
+
+
+%scalable algorithms on new architectures? different approaches than ``going around’’ Brandes for approximation? better data structures for fast dynamic approximation?
+% anche piu’ in general, magari riguardo alla necessita’ di smetterla di avere 200 misure e capire davvero cosa si vuole misurare e perche'.
+%
+
+%---------------------------------------------------------------------- SLIDE -
+
+\frame{
+
+  \frametitle{\bigskip \bigskip  \Huge Thank you!}
+
+\centering
+\begin{tabular}{c}
+
+  % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+  Francesco Bonchi \\  \emph{http://francescobonchi.com} \\ @FrancescoBonchi\\ $\;$ \\
+  Gianmarco De Francisci Morales \\ \emph{http://gdfm.me} \\  @gdfm7\\  $\;$ \\
+  Matteo Riondato \\ \emph{http://matteo.rionda.to} \\ @teorionda\\  $\;$ \\
+
+\end{tabular}
+
+
+\begin{block}{\centering Slides available at}
+\centering  http://matteo.rionda.to/centrtutorial/
+\end{block}
+
+}
