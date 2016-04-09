@@ -1,8 +1,31 @@
 \section{Approximation Algorithms}
+
+\begin{frame}
+  \frametitle{Why approximation?}
+\end{frame}
+
+\begin{frame}
+  \frametitle{What kind of approximation}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Sampling}
+  Why sampling, questions, what is the key issue in sampling
+\end{frame}
+
 \begin{frame}
   \frametitle{Outline}
   \begin{itemize}
-    \item XXX
+    \item Approximation algorithms for static graphs
+      \begin{itemize}
+        \item A sampling-based algorithm for closeness
+        \item A sampling+pivoting algorithm for closeness
+        \item Two sampling-based algorithms for betweenness
+      \end{itemize}
+    \item Approximation algorithms for dynamic graphs
+      \begin{itemize}
+        \item Two sampling-based algorithms for betweenness
+      \end{itemize}
   \end{itemize}
 \end{frame}
 
@@ -20,6 +43,85 @@
 \end{frame}
 
 \begin{frame}
+  \frametitle{Idea}
+  \vfill
+  Interested in closeness:
+  \[
+    \closeness(x)=\frac{n-1}{\sum_{y\neq x}d(x,y)}
+  \]
+  (inverse of the average distance)
+  \vfill
+  Fastest-known exact algorithm: APSP\\
+  \qquad I.e., run Dijkstra's algorithm from \emph{each} vertex $v$
+  \pause
+  \vfill
+  Algorithmic idea: only run Dijkstra from \emph{a few sources}!
+  \vfill
+\end{frame}
+
+\begin{frame}
+  \frametitle{Algorithm}
+  \begin{enumerate}
+    \item
+    \item
+    \item
+  \end{enumerate}
+  \pause
+  \begin{block}{Questions}
+    \begin{itemize}
+      \item Why is this a good idea?
+      \item How large should $k$ be to get a good approximation?
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Expectation}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Hoeffding Inequality}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Recap}
+
+  We'll see a similar approach in many other papers.
+\end{frame}
+
+\begin{frame}
+  \centering
+  \vfill
+  {\huge Computing Classic Closeness Centrality, at Scale}
+  \vfill
+  {\Large E.~Cohen, D.~Delling, T.~Pajor, R.~F.~Werneck}
+  \vfill
+  {\large COSN '14: ACM Conference on Social Networks (2014) }
+  \vfill
+\end{frame}
+
+\begin{frame}
+  \frametitle{Issue with Sampling}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Pivoting}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Hybrid Estimator}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Guarantees}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Experiments}
+\end{frame}
+
+
+\begin{frame}
   \centering
   \vfill
   {\Huge Centrality Estimation in Large Networks}
@@ -28,64 +130,6 @@
   \vfill
   {\large International Journal of Bifurcation and Chaos (2007)}
   \vfill
-\end{frame}
-
-\begin{frame}
-  \centering
-  \vfill
-  {\huge Better Approximation of Betweenness Centrality}
-  \vfill
-  {\Large R.~Geisberger, P.~Sanders, D.~Schultes}
-  \vfill
-  {\large ALENEX (2008)}
-  \vfill
-\end{frame}
-
-\begin{frame}
-  \centering
-  \vfill
-  {\huge Fast Approximation of Betweenness Centrality through Sampling}
-  \vfill
-  {\Large M.~Riondato, E.~M.~Kornaropoulos}
-  \vfill
-  {\large DMKD: Data Mining and Knowledge Discovery (2015)}
-  \vfill
-\end{frame}
-
-\begin{frame}
-  \frametitle{What vertices in a graph are important?}
-  Betweenness centrality is one measure of vertex importance\\
-  \quad Roughly, it is the fraction of Shortest Paths (SP) in a graph that go through a vertex
-  \vfill
-  Let $G=(V,E)$, $|V|=n$, $|E|=m$. The betweenness centrality of $v\in V$ is:
-  \[
-    \betw(v)=\underbrace{\frac{1}{n(n-1)}}_{\mbox{normalization}}\sum_{p_{uw}\in\mathbb{S}_G}
-    \underbrace{\frac{\mathds{1}_{\mathcal{T}_v}(p_{uw})}{\sigma_{uw}}}_{\in [0,1]}
-  \]
-  where:
-  \begin{itemize*}
-    \item $\mathbb{S}_G$: set of all SPs in $G$
-    \item $\mathcal{S}_{uw}$: set of all SPs from $u$ to $w$
-      ($\mathcal{S}_{uw}\subseteq\mathbb{S}_G$,
-      $|\mathcal{S}_{uw}|=\sigma_{uw}$)
-    \item $\mathcal{T}_v$: $\{p\in\mathbb{S}_G ~:~ v\in\mathsf{Int}(p)\}$
-  \end{itemize*}
-\end{frame}
-
-\begin{frame}
-  \frametitle{How to compute betweenness centrality?}
-  Na\"ive algorithm: All Pairs SP computation, followed by aggregation\\
-  \quad Aggregation dominates runtime, $\Theta(n^3)$
-  \vfill
-  [Brandes 2001]: Perform aggregation after each Single-Source SP (SSSP) computation\\
-  \quad Runtime: $O(nm)$ (unweighted $G$), $O(nm + n^2\log n)$ (weighted
-  $G$)\\
-  This is is still too much for graphs with $n=10^9$, $m=10^10$
-  \vfill
-  Possible solution: perform fewer SPs computations by sampling\\
-  \quad We get approximate results, but that's OK!
-  \vfill
-  What kind of approximation do we want ? What should we sample and how much?
 \end{frame}
 
 \begin{frame}
@@ -145,6 +189,80 @@
 \end{frame}
 
 \begin{frame}
+  \centering
+  \vfill
+  {\huge Better Approximation of Betweenness Centrality}
+  \vfill
+  {\Large R.~Geisberger, P.~Sanders, D.~Schultes}
+  \vfill
+  {\large ALENEX (2008)}
+  \vfill
+\end{frame}
+
+\begin{frame}
+  \frametitle{Issue with standard estimator}
+\end{frame}
+
+\begin{frame}
+  \frametitle{New estimator}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Reduced variance}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Experiments}
+\end{frame}
+
+\begin{frame}
+  \centering
+  \vfill
+  {\huge Fast Approximation of Betweenness Centrality through Sampling}
+  \vfill
+  {\Large M.~Riondato, E.~M.~Kornaropoulos}
+  \vfill
+  {\large DMKD: Data Mining and Knowledge Discovery (2015)}
+  \vfill
+\end{frame}
+
+%\begin{frame}
+%  \frametitle{What vertices in a graph are important?}
+%  Betweenness centrality is one measure of vertex importance\\
+%  \quad Roughly, it is the fraction of Shortest Paths (SP) in a graph that go through a vertex
+%  \vfill
+%  Let $G=(V,E)$, $|V|=n$, $|E|=m$. The betweenness centrality of $v\in V$ is:
+%  \[
+%    \betw(v)=\underbrace{\frac{1}{n(n-1)}}_{\mbox{normalization}}\sum_{p_{uw}\in\mathbb{S}_G}
+%    \underbrace{\frac{\mathds{1}_{\mathcal{T}_v}(p_{uw})}{\sigma_{uw}}}_{\in [0,1]}
+%  \]
+%  where:
+%  \begin{itemize*}
+%    \item $\mathbb{S}_G$: set of all SPs in $G$
+%    \item $\mathcal{S}_{uw}$: set of all SPs from $u$ to $w$
+%      ($\mathcal{S}_{uw}\subseteq\mathbb{S}_G$,
+%      $|\mathcal{S}_{uw}|=\sigma_{uw}$)
+%    \item $\mathcal{T}_v$: $\{p\in\mathbb{S}_G ~:~ v\in\mathsf{Int}(p)\}$
+%  \end{itemize*}
+%\end{frame}
+%
+%\begin{frame}
+%  \frametitle{How to compute betweenness centrality?}
+%  Na\"ive algorithm: All Pairs SP computation, followed by aggregation\\
+%  \quad Aggregation dominates runtime, $\Theta(n^3)$
+%  \vfill
+%  [Brandes 2001]: Perform aggregation after each Single-Source SP (SSSP) computation\\
+%  \quad Runtime: $O(nm)$ (unweighted $G$), $O(nm + n^2\log n)$ (weighted
+%  $G$)\\
+%  This is is still too much for graphs with $n=10^9$, $m=10^10$
+%  \vfill
+%  Possible solution: perform fewer SPs computations by sampling\\
+%  \quad We get approximate results, but that's OK!
+%  \vfill
+%  What kind of approximation do we want ? What should we sample and how much?
+%\end{frame}
+
+\begin{frame}
   \frametitle{What is wrong with this approach?}
   1) We need
   \[
@@ -171,11 +289,11 @@
   \vfill
   2) samples SPs according to a specific, non-uniform distribution over
   $\mathbb{S}_G$. For each sample, it performs a single $s-t$ SP computation
-    \begin{itemize}
-      \item More locality: fewer edges touched than single-source SP
-      \item Can use bidirectional search / A\textsuperscript{*},
-        \ldots
-      \end{itemize}
+  \begin{itemize}
+    \item More locality: fewer edges touched than single-source SP
+    \item Can use bidirectional search / A\textsuperscript{*},
+      \ldots
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -201,6 +319,10 @@
   \end{algorithm}
   Theorem: The output $\{\tilde{\betw}(v), v\in V\}$ is an
   $(\varepsilon,\delta$)-approximation
+\end{frame}
+
+\begin{frame}
+  \frametitle{VC-dimension}
 \end{frame}
 
 \begin{frame}
@@ -420,6 +542,109 @@
   \vfill
 \end{frame}
 
+\begin{frame}
+  \frametitle{What are Rademacher Averages?}
+  A measure of complexity of the data analysis task (FIM, in our case)
+  w.r.t.~sampling\\
+  \quad \inblue{VC-dimension on steroids}
+  \vfill
+  Definition is \inblue{hairy}: Let $\Sam=\{\tau_1,\dotsc,\tau_{|\Sam|}\}$, the Rademacher
+  Average on $\Sam$ is
+  \[
+    \inblue{\Rade(\Sam)=\expectation_\sigma\left[\sup_{A\subseteq\mathcal{I}}\frac{1}{\ell}\sum_{j=1}^{|\Sam|}
+    \sigma_j \phi_A(\tau_j)\left|\right. \Sam\right]}
+  \]
+  where the $\sigma_i$ are Rademacher rv's and $\phi_A(\tau_i)=\mathds{1}_{\tau_j}(A)$
+  \vfill
+  The \inblue{important part}: $\Rade(\Sam)$ is a \inblue{sample-dependent
+  quantity} and we have:
+  \[
+    %		\Pr\left(\displaystyle\sup_{A\subseteq\mathcal{I}}|f_\Ds(A)-f_\Sam(A)|\le\inblue{\underbrace{2\Rade(\Sam)
+    %			+\displaystyle\sqrt{\frac{2\ln(2/\delta)}{|\Sam|}}}_\eta}\right)\ge 1-\delta
+  \]
+  We develop a method to \inblue{efficiently compute an upper bound to
+  $\Rade(\Sam)$}\\
+  \quad So we can compute $\eta$ and \inblue{efficiently check the stopping condition ``$\eta\le\varepsilon/2$?''}
+\end{frame}
+
+\begin{frame}
+  \frametitle{How can we bound the Rademacher average?}
+  We must compute the bound \inblue{efficiently} or we lose the advantages of sampling
+  \vfill
+  Constraint: We can use \inblue{only} information that can be obtained with a
+  \inblue{single scan of $\Sam$}:\\
+  \begin{enumerate*}
+    \item $\inblue{F_\Sam}$: Frequencies in the sample of the single items ($F_\Sam=\{f_\Sam(a),
+      a\in\mathcal{I}\}$)
+    \item $\inblue{L_\Sam}$: Lengths of the transactions in $\Sam$ ($L_\Sam=\{|\tau|, \tau\in\Sam\}$)
+  \end{enumerate*}
+  \vfill
+  We use the above and \inblue{a variant of Massart's Lemma} to compute a
+  function \inblue{$w$} such that:
+  \[
+    \inblue{
+    \Rade(\Sam)\le \min_{s\in\mathbb{R}^+} w(s,F_\Sam,L_\Sam)
+    }
+  \]
+  The function \inblue{$w$ is convex} so \inblue{we can minimize it efficiently}
+  \vfill
+  Then we have $\eta= 2 \displaystyle\min_{s\in\mathbb{R}^+} w(s,F_\Sam,L_\Sam) +
+  \displaystyle\sqrt{\frac{2\ln(2/\delta)}{|\Sam|}}$ and we stop sampling when
+  $\eta\le\varepsilon/2$
+\end{frame}
+
+\begin{frame}
+  \frametitle{What is the intuition behind $w$?}
+  Lemma: $\Rade(\Sam)$ is a function of the frequency distribution of the
+  Closed Itemsets in $\Sam$
+  \vfill
+  The function $w$ is an upper bound to $\Rade(\Sam)$ using information from the sample
+  \begin{enumerate}
+    \item We use the lengths of the transaction in the sample to understand
+      how many CIs there are for each possible frequency
+    \item We use the frequencies of the items to bound the frequencies of
+      the CIs (anti-monotonicity)
+  \end{enumerate}
+  This does not require us to compute the CIs from $\Sam$ (they are only for the
+  analysis)
+  \vfill
+  \pause
+  By the way, here's $w$:
+  \[
+    \inblue{
+    w(s) =
+    \frac{1}{s}\ln\displaystyle\sum_{a\in\mathcal{I}_\Sam}\left(\left(1+\displaystyle\sum_{r=1}^{\chi_a}\displaystyle\sum_{j=1}^{g_{a,r}}2^{\min\{r,h_{a,r}-j\}}\right)e^{\frac{s^2f_\Sam(a)}{2n}}\right)
+    }
+  \]
+  See the paper for details :-)
+\end{frame}
+
+\begin{frame}
+  \frametitle{How to choose the next sample size ?}
+  Prev.~works used a fixed sample schedule increasing according to a user-specified parameter\\
+  \quad We can \inblue{compute the next sample size on the fly}: one fewer parameter!
+  \vfill
+  \inblue{First iteration}: Use a sample $\Sam$ of size at least
+  \inblue{$|\Sam|\ge8\displaystyle\frac{\ln(2/\delta)}{\varepsilon^2}$}\\
+  \quad Why? It is \inblue{impossible that $\eta\le\varepsilon/2$ at
+  smaller sample sizes}
+  \vfill
+  \inblue{Successive iterations}: multiply the sample size from the previous
+  iteration by $\displaystyle\left(\frac{2\eta}{\varepsilon}\right)^2$\\
+  \inblue{Intuition:} If the \inblue{frequencies of the items} in the current iteration
+  and the \inblue{distribution of the transaction lengths} are the \inblue{same as in the previous
+  iteration}, then the stopping condition will be satisfied at this iteration
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Issue with previous approach}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Rademacher averages}
+\end{frame}
+
 \subsection{Approximation Algorithms for Dynamic Graphs}
 
 \begin{frame}
@@ -431,6 +656,14 @@
   \vfill
   {\large ESA: European Symposium on Algorithms (2015)}
   \vfill
+\end{frame}
+
+\begin{frame}
+  \frametitle{Saving all the DAGS}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Recomputing the vertex diameter}
 \end{frame}
 
 \begin{frame}
@@ -446,13 +679,9 @@
 \end{frame}
 
 \begin{frame}
-  \centering
-  \vfill
-  {\huge Incremental Algorithm for Updating Betweenness Centrality in
-  Dynamically Growing Networks}
-  \vfill
-  {\Large M.~Kas, M.~Wachs, K.~M.~Carley, L.~R.~Carley}
-  \vfill
-  {\large ASONAM (2013)}
-  \vfill
+  \frametitle{A new data structure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Conclusions on approximation algorithms}
 \end{frame}
