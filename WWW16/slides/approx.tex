@@ -1,16 +1,97 @@
 \section{Approximation Algorithms}
 
 \begin{frame}
-  \frametitle{Why approximation?}
+  \frametitle{Why should we look for an approximation?}
+  \begin{block}{Static graphs}
+    \begin{itemize}
+      \item many interesting networks are \emph{web-scale};
+      \item computing the exact centralities can be extremely expensive;
+      \item is there a real reason (i.e., application) to \emph{require} the
+        exact values?
+    \end{itemize}
+  \end{block}
+  \pause
+  \begin{block}{Dynamic graphs}
+    \begin{itemize}
+      \item exact centralities change at all times;
+      \item not worth chasing for highly volatile quantities;
+    \end{itemize}
+  \end{block}
+  \pause
+  In both cases, \emph{high quality} approximations are \emph{sufficient in
+  practice}
 \end{frame}
 
 \begin{frame}
   \frametitle{What kind of approximation}
+  \begin{itemize}
+    \item $v$: vertex with exact centrality $c(v)$
+    \item $\tilde{c}(v)$: value that ``approximates'' $c(v)$
+  \end{itemize}
+  \begin{definition}[Absolute error]
+    \centering
+    $\mathsf{err}_\mathrm{abs}(v)=|c(v)-\tilde{c}(v)|$
+  \end{definition}
+  \begin{definition}[Relative error]
+    \centering
+    $\mathsf{err}_\mathrm{rel}(v)=|c(v)-\tilde{c}(v)|/c(v)$
+  \end{definition}
+  \pause
+  \begin{definition}[$(\varepsilon,\delta)$-approximation]
+    \begin{itemize}
+      \item Let $\varepsilon\in(0,1)$ and $\delta\in(0,1)$;
+      \item a \emph{$(\varepsilon,\delta)$-approximation} is a \emph{set}
+        $\{\tilde{c}(v), v\in V\}$ of $n$ values, such that
+        \[
+          \Pr\left(\exists v\in V \text{ s.t. } \mathsf{err}(v)
+          >\varepsilon\right)\le \delta;
+        \]
+        \vspace{-20pt}
+      \pause
+      \item it offers \emph{uniform probabilistic guarantees} over all the
+        nodes;
+        \pause
+      \item it assumes \emph{normalized} versions of centrality (i.e., in
+        $[0,1]$).
+    \end{itemize}
+  \end{definition}
 \end{frame}
 
 \begin{frame}
   \frametitle{Sampling}
-  Why sampling, questions, what is the key issue in sampling
+  Many of the algorithms we present are \emph{sampling-based}.
+  \begin{block}{General Sampling Based Algorithm}
+    \begin{enumerate}
+      \item Select \emph{independently at random} (not all \emph{uniformly})
+        a \emph{small} set of \emph{objects} (e.g., single vertices, pair of vertices, shortest
+        paths);
+        \pause
+      \item Perform some computation using these objects (e.g., SSSP from vertex);
+        \pause
+      \item Use the results of the computation to estimate the centrality of all
+        nodes;
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Sampling}
+  \begin{block}{Why sampling?}
+    By only select a small subset of the ``objects'' (instead of the whole set),
+    computing the approximation is faster than computing the exact values
+  \end{block}
+  \pause
+  \begin{block}{Questions for sampling algorithms}
+    \begin{itemize}
+      \item What ``objects'' to sample?
+        \pause
+      \item How to sample? If sampling procedure is slow, then the advantages
+        are lost;
+        \pause
+      \item How many objects to sample in order to guarantee an
+        $(\varepsilon,\delta)$-approximation?
+    \end{itemize}
+  \end{block}
 \end{frame}
 
 \begin{frame}
@@ -45,7 +126,7 @@
 \begin{frame}
   \frametitle{Idea}
   \vfill
-  Interested in closeness:
+  Interested in approximating \emph{closeness}:
   \[
     \closeness(x)=\frac{n-1}{\sum_{y\neq x}d(x,y)}
   \]
@@ -55,38 +136,89 @@
   \qquad I.e., run Dijkstra's algorithm from \emph{each} vertex $v$
   \pause
   \vfill
-  Algorithmic idea: only run Dijkstra from \emph{a few sources}!
+  Idea: only run Dijkstra from \emph{a few sources}!
   \vfill
-\end{frame}
-
-\begin{frame}
-  \frametitle{Algorithm}
-  \begin{enumerate}
-    \item
-    \item
-    \item
-  \end{enumerate}
   \pause
-  \begin{block}{Questions}
-    \begin{itemize}
-      \item Why is this a good idea?
-      \item How large should $k$ be to get a good approximation?
-    \end{itemize}
+  \begin{block}{Warning}
+    The algorithm actually computes an approximation for
+    the \emph{inverse} of closeness:
+    \[
+      \closeness^{-1}(v)=\frac{\sum_{y\neq x}d(u,v)}{n-1}
+    \]
+    (effectively the average distance)
   \end{block}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Expectation}
+  \frametitle{Algorithm}
+  \begin{block}{}
+    \begin{itemize}
+      \item Let $k$ be the number of sources to obtain the desired
+        approximation;
+        \pause
+      \item For $i=1,\dotsc, k$:
+        \begin{itemize}
+          \item pick a vertex $u_i$ uniformly at random
+            \pause
+          \item run Dijkstra from $u_i$
+        \end{itemize}
+      \item Let
+        \[
+          \widetilde{\closeness^{-1}}(v)=\frac{n}{n-1}\frac{\sum_{i=1}^k
+          d(u_i,v_i)}{k}
+        \]
+    \end{itemize}
+  \end{block}
+  \pause
+  \begin{theorem}
+    $\mathbb{E}\left[\widetilde{\closeness^{-1}}(v)\right]=\closeness^{-1}(v)$.
+  \end{theorem}
+  \pause
+  \begin{block}{Question}
+    How large should $k$ be to get a good approximation of $\closeness^{-1}$?
+  \end{block}
 \end{frame}
 
 \begin{frame}
   \frametitle{Hoeffding Inequality}
+  \begin{itemize}
+    \item A concentration inequality for the sum of independent random
+      variables;
+    \item It allows to study the trade-off between the error (difference between
+      sample value and expectation) and the sample size;
+  \end{itemize}
+  \pause
+  \begin{theorem}[Hoeffding Inequality]
+    Let $x_1,\dotsc, x_n$ be independent r.v., with
+    \begin{itemize}
+      \item $a_i\le x_i\le b_i$
+      \item $\mu=\mathbb{E}[\sum x_i/k]$
+    \end{itemize}
+    Then, for $\xi > 0$,
+    \[
+      \Pr\left(\left|\frac{\sum_{i=1}^kx_i}{k}-\mu\right|\ge\xi\right)\le
+      2e^{-2k^2\xi^2/\sum_{i=1}^k(b_i-a_i)^2}
+    \]
+  \end{theorem}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Recap}
-
-  We'll see a similar approach in many other papers.
+  \frametitle{How much to sample}
+  \begin{lemma}
+    Let $\Delta$ be the diameter of the graph and let
+    $\varepsilon,\delta\in(0,1)$. If
+    \[
+      k=\Theta\left(\frac{\log n}{\varepsilon^2}\right),
+    \]
+    Then, \emph{with high probability} (i.e., with probability $\ge 1/n$)
+    \[
+      \left|\widetilde{\closeness^{-1}}(v)-\closeness^{-1}(v)\right|\le\Delta\varepsilon,
+      \text{ for all } v\in V
+    \]
+  \end{lemma}
+  \pause
+  Algorithm running time: $O\left(\frac{\log n}{\varepsilon^2}(n\log n +
+  m)\right)$.
 \end{frame}
 
 \begin{frame}
@@ -101,7 +233,24 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Issue with Sampling}
+  \frametitle{Issues with sampling}
+  \begin{itemize}
+    \item Assume that the distance distribution from a node $v$ has a
+      \emph{heavy tail};
+    \item the average distance
+      \[
+        \closeness^{-1}(v)=\frac{\sum_{u\neq v}d(u,v)}{n-1}\enspace
+      \]
+      is dominated by few distant nodes;
+    \pause
+    \item it is unlikely that these nodes are among the ones that are sampled
+    \pause
+    \item Hence the sample average
+      \[
+        \widetilde{\closeness^{-1}}(v)=\frac{n-1}{n}\frac{\sum_{i=1}d(u_i,v)}{k}
+      \]
+      is a \emph{poor estimator} of the average distance $\closeness^{-1}(v)$.
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
