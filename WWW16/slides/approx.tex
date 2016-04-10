@@ -269,7 +269,6 @@
   \frametitle{Experiments}
 \end{frame}
 
-
 \begin{frame}
   \centering
   \vfill
@@ -282,57 +281,67 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{What kind of approximation do we want?}
-  We want uniform quality guarantees on the approximations of all vertices
-  \vfill
-  Definition:\\
-  \quad For $\varepsilon,\delta\in(0,1)$, an $(\varepsilon,\delta)$-approximation is
-  a collection $\{\tilde{\betw}(v), v\in V\}$ such that
+  \frametitle{Betweenness centrality}
+  We consider a \emph{normalized} version:
   \[
-    \Pr(\exists v\in V ~:~ |\tilde{\betw}(v) -\betw(v)|>\varepsilon)<\delta
+    \betw(v)=\frac{1}{n(n-1)}\sum_{s,t\neq v}\frac{\sigma_{st}(v)}{\sigma_{st}}\in[0,1]
   \]
-  $\varepsilon$ controls the accuracy, $\delta$ controls the confidence
-  \vfill
-  Trade-off: smaller $\varepsilon$ or $\delta$ $\Rightarrow$ higher number of
-  samples $\Rightarrow$ slower runtime
+  \begin{itemize}
+    \item $\sigma_{st}$: number of SPs from $s$ to $t$
+    \item $\sigma_{st}(v)$: number of SPs from $s$ to $t$ going through $v$
+  \end{itemize}
+  \pause
+  Exact algorithm: Brandes' Algorithm
+  \begin{enumerate}
+    \item Run Dijkstra's algorithm \emph{from each source vertex $s$}
+    \item After each run, perform aggregation by walking SP DAG backwards
+  \end{enumerate}
+  \pause
+  Idea: run Dikstra only from a few sources (as in EW'01)
 \end{frame}
 
 \begin{frame}
   \frametitle{How can one get an $(\varepsilon,\delta)$-approximation?}
-  [Brandes and Pich, 2008]: only run SSSP and aggregation from a few sources
-  \vfill
   \begin{algorithm}[H]
     \DontPrintSemicolon
-    $r\leftarrow \frac{1}{\varepsilon^2}\left(\ln n + \ln 2 +
+    $k\leftarrow \frac{1}{\varepsilon^2}\left(\ln n + \ln 2 +
     \ln\frac{1}{\delta}\right)$ \texttt{// sample size}\;
     $\tilde{\betw}(v)\leftarrow 0$, for all $v\in V$\;
-    \For(\texttt{// the exact algorithm would iterate over $V$}){$i\leftarrow 1,\dotsc,r$} {
+    \For(\texttt{// Brandes' algo iterates over $V$}){$i\leftarrow 1,\dotsc,k$} {
       $v_i \leftarrow$ random vertex from $V$, chosen uniformly\;
       Perform single-source SP computation from $v_i$\;
       Perform partial aggregation, updating $\tilde{\betw}(u)$, $u\in V$,
       like in exact algorithm\;
     }
-    Output $\{\tilde{\betw{v}}, v\in V\}$\;
+    Output $\{\tilde{\betw(v)}, v\in V\}$\;
   \end{algorithm}
   \vfill
-  Theorem: The output is an $(\varepsilon,\delta)$-approximation
+  \pause
+  \begin{theorem}
+    The output is a $(\varepsilon,\delta)$-approximation:
+    \[
+      \Pr\left(\exists v\in V \text{ s.t. }
+      |\tilde{\betw}(v)-\betw{v}|>\varepsilon\right)\le \delta
+    \]
+  \end{theorem}
 \end{frame}
 
 \begin{frame}
   \frametitle{How do they prove it?}
-  Start with bounding the deviation for a single vertex $v$ (Hoeffding bound):
+  Start with bounding the deviation for a single vertex $v$ (Hoeffding inequality):
   \[
-    \Pr(|\tilde{\betw}(v)-\betw(v)|>\varepsilon)\le 2e^{-2r\varepsilon^2}
+    \Pr(|\tilde{\betw}(v)-\betw(v)|>\varepsilon)\le 2e^{-2k\varepsilon^2}
   \]
   \vfill
-  Then take the union bound over $n$ vertices to ensure uniform converge\\
-  \quad the sample size $r$ must be such that
+  Then take the union bound over $n$ vertices to ensure uniform convergence
+  \vfill
+  The sample size $k$ must be such that
   \[
-    2e^{-2r\varepsilon^2}\le\frac{\delta}{n}
+    2e^{-2k\varepsilon^2}\le\frac{\delta}{n}
   \]
   That is, to get an $(\varepsilon,\delta)$-approximation, we need
   \[
-    r\ge\frac{1}{2\varepsilon^2}\left(\ln n + \ln 2 +
+    k\ge\frac{1}{2\varepsilon^2}\left(\ln n + \ln 2 +
     \ln\frac{1}{\delta}\right)
   \]
 \end{frame}
@@ -349,11 +358,78 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Issue with standard estimator}
+  \frametitle{Issues with standard estimator}
+    The standard estimator
+    \[
+      \tbetw(v)=\frac{1}{k}\sum_{i=1}^k \delta_{u_i}(v)
+    \]
+    produces large overestimates for unimportant vertices close to a sampled
+    vertex
+  \pause
+  \begin{block}{Example}
+    \begin{itemize}
+      \item Let $v$ be a degree-two vertex connecting a degree-one vertex $u$ to
+        the rest of the network;
+      \item If $u$ is sampled, then $\tbetw(v)$ overestimates $\betw(v)$ by a
+        factor of $n/k$
+    \end{itemize}
+  \end{block}
+  \pause
+  Possible solution: stop vertices from ``profiting'' for being near a sampled
+  vertex.
+\end{frame}
+
+\begin{frame}
+  \frametitle{A new sampling scheme}
+  Idea: sample \emph{pairs} $(s,d)$ of vertex and \emph{direction} (`forward'' or
+  ``backward'')
+  \pause
+  \begin{itemize}
+    \item When sampling $(s,\text{forward})$
+      \begin{itemize}
+        \item run Dijkstra from $s$
+      \end{itemize}
+      \pause
+    \item When sampling $(t,\text{backward}$)
+      \begin{itemize}
+        \item virtually flip direction of edges (if directed graph);
+        \item run Dijkstra from $s$
+      \end{itemize}
+  \end{itemize}
+  \pause
+  We need to adapt the estimator $\tbetw(v)$.
 \end{frame}
 
 \begin{frame}
   \frametitle{New estimator}
+  For a vertex $v$, define
+  \[
+    g_v(u,d)=\left\{\begin{array}{ll}
+        \sum_{t\in V,t\neq u,v} \frac{\sigma_{ut}(v)}{\sigma_{ut}}\frac{d(u,v)}{d(v,t)}
+        & \text{if } d=\text{forward}\\
+        \sum_{t\in V,t\neq u,v}
+        \frac{\sigma_{ut}(v)}{\sigma_{ut}}\left(1-\frac{d(u,v)}{d(v,t)}\right)
+        & \text{if } d=\text{backward}\end{array}\right.
+  \]
+  \pause
+  The new estimator for $\betw(v)$ is
+  \[
+    \tbetw(v)=\frac{2}{k}\sum_{i=1}^k g_v(u_i,d_i)
+  \]
+  The factor $2$ corrects for the reduced sampling probabilities ($1/2n$)
+  \pause
+  \begin{theorem}
+    If
+    \[
+      k\ge XXX,
+    \]
+    then the output is a $(\varepsilon,\delta)$-approximation:
+    \[
+      \Pr\left(\exists v\in V \text{ s.t. }
+      |\tilde{\betw}(v)-\betw{v}|>\varepsilon\right)\le \delta
+    \]
+    \vspace{-10pt}
+  \end{theorem}
 \end{frame}
 
 \begin{frame}
@@ -375,47 +451,11 @@
   \vfill
 \end{frame}
 
-%\begin{frame}
-%  \frametitle{What vertices in a graph are important?}
-%  Betweenness centrality is one measure of vertex importance\\
-%  \quad Roughly, it is the fraction of Shortest Paths (SP) in a graph that go through a vertex
-%  \vfill
-%  Let $G=(V,E)$, $|V|=n$, $|E|=m$. The betweenness centrality of $v\in V$ is:
-%  \[
-%    \betw(v)=\underbrace{\frac{1}{n(n-1)}}_{\mbox{normalization}}\sum_{p_{uw}\in\mathbb{S}_G}
-%    \underbrace{\frac{\mathds{1}_{\mathcal{T}_v}(p_{uw})}{\sigma_{uw}}}_{\in [0,1]}
-%  \]
-%  where:
-%  \begin{itemize*}
-%    \item $\mathbb{S}_G$: set of all SPs in $G$
-%    \item $\mathcal{S}_{uw}$: set of all SPs from $u$ to $w$
-%      ($\mathcal{S}_{uw}\subseteq\mathbb{S}_G$,
-%      $|\mathcal{S}_{uw}|=\sigma_{uw}$)
-%    \item $\mathcal{T}_v$: $\{p\in\mathbb{S}_G ~:~ v\in\mathsf{Int}(p)\}$
-%  \end{itemize*}
-%\end{frame}
-%
-%\begin{frame}
-%  \frametitle{How to compute betweenness centrality?}
-%  Na\"ive algorithm: All Pairs SP computation, followed by aggregation\\
-%  \quad Aggregation dominates runtime, $\Theta(n^3)$
-%  \vfill
-%  [Brandes 2001]: Perform aggregation after each Single-Source SP (SSSP) computation\\
-%  \quad Runtime: $O(nm)$ (unweighted $G$), $O(nm + n^2\log n)$ (weighted
-%  $G$)\\
-%  This is is still too much for graphs with $n=10^9$, $m=10^10$
-%  \vfill
-%  Possible solution: perform fewer SPs computations by sampling\\
-%  \quad We get approximate results, but that's OK!
-%  \vfill
-%  What kind of approximation do we want ? What should we sample and how much?
-%\end{frame}
-
 \begin{frame}
   \frametitle{What is wrong with this approach?}
   1) We need
   \[
-    r\ge\frac{1}{2\varepsilon^2}\left(\ln n + \ln 2 +
+    k\ge\frac{1}{2\varepsilon^2}\left(\ln n + \ln 2 +
     \ln\frac{1}{\delta}\right)
   \]
   \begin{itemize}
@@ -423,7 +463,7 @@
     \item The sample size depends on $\ln n$. This is not the right
       quantity: not all graphs of $n$ nodes are equally ``difficult'': e.g., the $n$-star is ``easier'' than a random graph
   \end{itemize}
-  The sample size $r$ should depend on a more-specific characteristic of the graph
+  The sample size $k$ should depend on a more-specific characteristic of the graph
   \vfill
   2) At each iteration, the algorithm performs a SSSP computation\\
   \quad Full exploration of the graph, no locality
@@ -431,13 +471,15 @@
 
 \begin{frame}
   \frametitle{How can we improve the sample size?}
-  [R. and Kornaropoulos, 2014] present an algorithm that:
+  [R. and Kornaropoulos, 2015] present an algorithm that:
   \vfill
   1) uses a sample size which depends on the vertex-diameter, a characteristic
-  quantity of the graph. The derivation uses VC-dimension
+  quantity of the graph. The derivation uses the \emph{VC-dimension} of the
+  problem;
   \vfill
-  2) samples SPs according to a specific, non-uniform distribution over
-  $\mathbb{S}_G$. For each sample, it performs a single $s-t$ SP computation
+  2) samples SPs according to a specific, non-uniform distribution over the set
+  $\mathbb{S}_G$ of \emph{all SPs in the graph}. For each sample, it performs a
+  single $s-t$ SP computation
   \begin{itemize}
     \item More locality: fewer edges touched than single-source SP
     \item Can use bidirectional search / A\textsuperscript{*},
@@ -451,17 +493,17 @@
     \DontPrintSemicolon
     $\mathsf{VD}(G)\leftarrow$ vertex-diameter of $G$ \texttt{// stay
     tuned!}\;
-    $r\leftarrow\frac{1}{2\varepsilon^2}\left(\lfloor\log_2(\mathsf{VD}(G)-2\rfloor)
+    $k\leftarrow\frac{1}{2\varepsilon^2}\left(\lfloor\log_2(\mathsf{VD}(G)-2\rfloor)
     +1 + \ln(1/\delta)\right)$ \texttt{// sample size}\;
     $\tilde{\betw}(v)\leftarrow 0$, for all $v\in V$\;
-    \For{$i\leftarrow 1\dotsc,r$}{
+    \For{$i\leftarrow 1\dotsc,k$}{
       $(u,v)\leftarrow$ random pair of different vertices, chosen
       uniformly\;
       $\mathcal{S}_{uv}\leftarrow$ all SPs from $u$ to $v$ \texttt{//
       Dijkstra, trunc.~BFS, \ldots}\;
       $p\leftarrow$ random element of $\mathcal{S}_{uv}$, chosen
       uniformly \texttt{// not uniform over $\mathbb{S}_G$}\;
-      $\tilde{\betw}(w)\leftarrow \tilde{\betw}(w) + 1/r$, for all
+      $\tilde{\betw}(w)\leftarrow \tilde{\betw}(w) + 1/k$, for all
       $w\in\mathsf{Int}(p)$ \texttt{// update only nodes along $p$}\;
     }
     Output $\{\tilde{\betw}(v), v\in V\}$
@@ -636,7 +678,7 @@
   \vfill
   \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.22]{imgs/email-Enron-error.pdf}
+    \includegraphics[width=\textwidth]{imgs/email-Enron-error.pdf}
   \end{figure}
 \end{frame}
 
@@ -644,12 +686,12 @@
   \frametitle{How fast is the algorithm?}
   Approximately 8 times faster than the simple sampling algorithm
   \vfill
-  Variable speedup w.r.t. exact algorithm (200x -- 4x), depending on
+  Variable speedup w.r.t.~exact algorithm (200x -- 4x), depending on
   $\varepsilon$
   \vfill
   \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.22]{imgs/email-Enron-time.pdf}
+    \includegraphics[width=\textwidth]{imgs/email-Enron-time.pdf}
   \end{figure}
 \end{frame}
 
@@ -660,7 +702,7 @@
   \vfill
   \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.22]{imgs/random-time.pdf}
+    \includegraphics[width=\textwidth]{imgs/random-time.pdf}
   \end{figure}
 \end{frame}
 
@@ -689,6 +731,10 @@
   \vfill
   {\large arXiv (2016)}
   \vfill
+\end{frame}
+
+\begin{frame}
+  \frametitle{Issue with previous approach}
 \end{frame}
 
 \begin{frame}
@@ -783,15 +829,6 @@
   \inblue{Intuition:} If the \inblue{frequencies of the items} in the current iteration
   and the \inblue{distribution of the transaction lengths} are the \inblue{same as in the previous
   iteration}, then the stopping condition will be satisfied at this iteration
-\end{frame}
-
-
-\begin{frame}
-  \frametitle{Issue with previous approach}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Rademacher averages}
 \end{frame}
 
 \subsection{Approximation Algorithms for Dynamic Graphs}
