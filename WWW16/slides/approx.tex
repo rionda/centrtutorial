@@ -378,7 +378,7 @@
     \item After each run, perform aggregation by walking SP DAG backwards
   \end{enumerate}
   \pause
-  Idea: run Dikstra only from a few sources (as in EW'01)
+  Idea: run Dijkstra only from a few sources (as in EW'01)
 \end{frame}
 
 \begin{frame}
@@ -539,33 +539,39 @@
 
 \begin{frame}
   \frametitle{What is wrong with this sampling approach?}
-  1) We need
+  1) The algorithm needs
   \[
     k\ge\frac{1}{2\varepsilon^2}\left(\ln n + \ln 2 +
     \ln\frac{1}{\delta}\right)
   \]
   \begin{itemize}
-    \item This is loose, due to the union bound and does not scale well (experiments)
-    \item The sample size depends on $\ln n$. This is not the right
-      quantity: not all graphs of $n$ nodes are equally ``difficult'': e.g., the $n$-star is ``easier'' than a random graph
+    \item This is \emph{loose due to the union bound}, and does not scale well
+      (experiments)
+    \pause
+    \item The sample size depends on $\ln n$. This is \emph{not the right
+      quantity}: not all graphs of $n$ nodes are equally ``difficult'': e.g., the $n$-star is ``easier'' than a random graph
   \end{itemize}
-  The sample size $k$ should depend on a more-specific characteristic of the graph
+  \pause
+  The sample size $k$ should depend on a more \emph{specific characteristic
+  quantity of the graph}
   \vfill
+  \pause
   2) At each iteration, the algorithm performs a SSSP computation\\
-  \quad Full exploration of the graph, no locality
+  \quad \emph{Full exploration} of the graph, no locality
 \end{frame}
 
 \begin{frame}
   \frametitle{How can we improve the sample size?}
   [R. and Kornaropoulos, 2015] present an algorithm that:
   \vfill
-  1) uses a sample size which depends on the vertex-diameter, a characteristic
-  quantity of the graph. The derivation uses the \emph{VC-dimension} of the
-  problem;
+  1) uses a sample size which depends on the \emph{vertex-diameter}, a
+  characteristic quantity of the graph.\\
+  \qquad The derivation uses the \emph{VC-dimension} of the problem;
+  \pause
   \vfill
-  2) samples SPs according to a specific, non-uniform distribution over the set
-  $\mathbb{S}_G$ of \emph{all SPs in the graph}. For each sample, it performs a
-  single $s-t$ SP computation
+  2) samples SPs according to a specific, \emph{non-uniform distribution} over
+  the set $\mathbb{S}_G$ of \emph{all SPs in the graph}. For each sample, it
+  performs a single $s-t$ SP computation
   \begin{itemize}
     \item More locality: fewer edges touched than single-source SP
     \item Can use bidirectional search / A\textsuperscript{*},
@@ -594,12 +600,54 @@
     }
     Output $\{\tilde{\betw}(v), v\in V\}$
   \end{algorithm}
-  Theorem: The output $\{\tilde{\betw}(v), v\in V\}$ is an
-  $(\varepsilon,\delta$)-approximation
+  \pause
+  \begin{theorem}
+    The output $\{\tilde{\betw}(v), v\in V\}$ is an
+    $(\varepsilon,\delta$)-approximation.
+  \end{theorem}
 \end{frame}
 
 \begin{frame}
   \frametitle{VC-dimension}
+  \begin{itemize}
+    \item The \emph{Vapnik-Chervonkenkis (VC) dimension} is a
+      \emph{combinatorial quantity} that allows to study the \emph{sample
+      complexity} of a learning problem;
+    \pause
+    \item It allows to obtain \emph{uniform guarantees} on sample-based
+      approximations of
+      expectations of all functions in a family $\family$;
+    \pause
+    \item Not easy to compute exactly, somewhat easier to give upper bounds;
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \begin{theorem}[VC $\varepsilon$-sample]
+    \begin{itemize}
+      \item Let $\family$ be a family of functions from a domain $\domain$ into
+        $\{0,1\}$;
+      \pause
+      \item Let $d$ be an upper bound to the VC-dimension of $\family$;
+      \pause
+      \item Let $\varepsilon\in(0,1)$ and $\delta\in(0,1)$
+      \pause
+      \item Let $\Sam$ be a random sample of $\domain$ of size
+        \[
+          |\Sam|\ge\frac{1}{\varepsilon^2}\left(d+\ln\frac{1}{\delta}\right)
+        \]
+        obtained by sampling $\domain$ according to a prob.~distribution
+        $\pi$
+      \pause
+      \item Then
+        \[
+          \Pr\left(\exists f\in\family \text{ s.t. }
+          \left|\frac{1}{|\Sam|}\sum_{s\in\Sam}f(s)-\mathbb{E}_\pi[f]\right|>\varepsilon\right)<\delta\enspace.
+        \]
+    \end{itemize}
+  \end{theorem}
+  In other words: if we sample proportionally to the VC-dimension, we can
+  approximate all expectations with their sample averages.
 \end{frame}
 
 \begin{frame}
@@ -607,8 +655,7 @@
   We want to prove that the output $\{\tilde{\betw}(v), v\in V\}$ is an
   $(\varepsilon,\delta$)-approximation
   \vfill
-  Let's apply the recipe!
-
+  Roadmap:
   \begin{enumerate}
     \item  Define betweenness centrality computation as a expectation
       estimation problem (domain $\domain$, family $\family$, distribution
@@ -620,80 +667,86 @@
   \end{enumerate}
 \end{frame}
 
-\begin{frame}
-  \frametitle{How to define the expectation estimation task?}
-  \begin{itemize}
-    \item The domain $\domain$ is $\mathbb{S}_G$ (all SPs in $G$)\\
-    \item The family is $\family=\{\mathds{1}_{\mathcal{T}_v}, v\in V\}$,
-      where $\mathcal{T}_v=\{p\in\mathbb{S}_G ~:~: v\in\mathsf{Int}(p)\}$
-    \item The probability distribution $\prob$ on $\domain$ is
-      \[
-        \pi(p_{uw})=\frac{1}{n(n-1)}\frac{1}{\sigma_{uw}}
-      \]
-      The algorithm samples paths according to $\pi$
-  \end{itemize}
-  \vfill
-  We have
-  \[
-    \expectation_\pi[\mathds{1}_{\mathcal{T}_v}]=\sum_{p_{uw}\in\mathbb{S}_G}\mathds{1}_{\mathcal{T}_v}\pi(p_{uw})=\sum_{p_{uw}\in\mathbb{S}_G}\mathds{1}_{\mathcal{T}_v}(p_{uw})\frac{1}{n(n-1)}\frac{1}{\sigma_{uw}}=\betw(v)
-  \]
-\end{frame}
+%\begin{frame}
+%  \frametitle{How to define the expectation estimation task?}
+%  \begin{itemize}
+%    \item The domain $\domain$ is $\mathbb{S}_G$ (all SPs in $G$)\\
+%    \item The family is $\family=\{\mathds{1}_{\mathcal{T}_v}, v\in V\}$,
+%      where $\mathcal{T}_v=\{p\in\mathbb{S}_G ~:~: v\in\mathsf{Int}(p)\}$
+%    \item The probability distribution $\prob$ on $\domain$ is
+%      \[
+%        \pi(p_{uw})=\frac{1}{n(n-1)}\frac{1}{\sigma_{uw}}
+%      \]
+%      The algorithm samples paths according to $\pi$
+%  \end{itemize}
+%  \vfill
+%  We have
+%  \[
+%    \expectation_\pi[\mathds{1}_{\mathcal{T}_v}]=\sum_{p_{uw}\in\mathbb{S}_G}\mathds{1}_{\mathcal{T}_v}\pi(p_{uw})=\sum_{p_{uw}\in\mathbb{S}_G}\mathds{1}_{\mathcal{T}_v}(p_{uw})\frac{1}{n(n-1)}\frac{1}{\sigma_{uw}}=\betw(v)
+%  \]
+%\end{frame}
 
 \begin{frame}
   \frametitle{How do we bound the VC-dimension?}
-  Definition: The vertex-diameter $\mathsf{VD}(G)$ of $G$ is the maximum
-  number of vertices in a SP of $G$
-  \[
-    \mathsf{VD}(G)=\max\{|p|, p\in\mathbb{S}_G\}
-  \]
+  \begin{definition}[Vertex-diameter]
+    The vertex-diameter $\mathsf{VD}(G)$ of $G$ is the maximum number of
+    vertices in a SP of $G$:
+    \[
+      \mathsf{VD}(G)=\max\{|p|, p\in\mathbb{S}_G\}\enspace.
+    \]
+  \end{definition}
   If $G$ is unweighted, $\mathsf{VD}(G)=\Delta(G)+1$. Otherwise no relationship\\
   Very small in social networks, even huge ones (shrinking diameter effect)
   \vfill
+  \pause
   Computing $\mathsf{VD}(G)$: $\left(2\frac{\mbox{max.~edge weight}}{\mbox{min.~edge
   weight}}\right)$-approximation via single-source SP
+  \pause
   \vfill
-  Theorem: The VC-dimension of $(\mathbb{S}_G,F)$ is at most $\lfloor\log_2\mathsf{VD}(G)
+  \begin{theorem}
+    The VC-dimension of $(\mathbb{S}_G,F)$ is at most $\lfloor\log_2\mathsf{VD}(G)
   -2\rfloor +1$
+  \end{theorem}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Let's prove it!}
-  Theorem: The VC-dimension is at most $\lfloor\log_2\mathsf{VD}(G)
-  -2\rfloor +1$
-  \vfill
-  Proof:
-  \begin{itemize}
-    \item For a set $A\subseteq\mathbb{S}_G$ of size $|A|=d$ to be
-      shattered, any $p$ in $A$ must appear in at least $2^{d-1}$
-      different sets $\mathcal{T}_v$, one for each subset of $A$
-      containing $p$.
-    \item Any $p$ appears only in the sets $\mathcal{T}_v$ such that
-      $v\in\mathsf{Int}(p)$\\
-      \quad There are $|\mathsf{Int}(p)|$ such sets
-    \item From the definition of the vertex-diameter $\mathsf{VD}(G)$, we have
-      $|\mathsf{Int}(p)|\le\mathsf{VD}(G)-2$
-    \item To shatter $A$, $d$ must be such that $2^{d-1}\le\mathsf{VD}(G)-2$
-    \item So $d$ can be at most $\lfloor\log_2\mathsf{VD}(G) -2\rfloor +1$,
-      otherwise $A$ can not be shattered
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{How to use the bound?}
-  We have that:
-  \begin{itemize}
-    \item The estimation $\tilde{\betw}(v)$ computed by the algorithm is the
-      empirical average for $\betw(v)$
-    \item The algorithm samples SPs efficiently according to $\prob$
-    \item We know an upper bound to the VC-dimension and how to compute it
-      efficiently
-  \end{itemize}
-  Thus we can apply the VC $\varepsilon$-sample theorem, and obtain that the algorithm
-  outputs an $(\varepsilon,\delta)$-approximation:
-  \[
-    \Pr(\exists v\in V ~:~ |\tilde{\betw}(v)-\betw(v)|>\varepsilon)<\delta
-  \]
-\end{frame}
+%\begin{frame}
+%  \frametitle{Let's prove it!}
+%  Theorem: The VC-dimension is at most $\lfloor\log_2\mathsf{VD}(G)
+%  -2\rfloor +1$
+%  \vfill
+%  Proof:
+%  \begin{itemize}
+%    \item For a set $A\subseteq\mathbb{S}_G$ of size $|A|=d$ to be
+%      shattered, any $p$ in $A$ must appear in at least $2^{d-1}$
+%      different sets $\mathcal{T}_v$, one for each subset of $A$
+%      containing $p$.
+%    \item Any $p$ appears only in the sets $\mathcal{T}_v$ such that
+%      $v\in\mathsf{Int}(p)$\\
+%      \quad There are $|\mathsf{Int}(p)|$ such sets
+%    \item From the definition of the vertex-diameter $\mathsf{VD}(G)$, we have
+%      $|\mathsf{Int}(p)|\le\mathsf{VD}(G)-2$
+%    \item To shatter $A$, $d$ must be such that $2^{d-1}\le\mathsf{VD}(G)-2$
+%    \item So $d$ can be at most $\lfloor\log_2\mathsf{VD}(G) -2\rfloor +1$,
+%      otherwise $A$ can not be shattered
+%  \end{itemize}
+%\end{frame}
+%
+%\begin{frame}
+%  \frametitle{How to use the bound?}
+%  We have that:
+%  \begin{itemize}
+%    \item The estimation $\tilde{\betw}(v)$ computed by the algorithm is the
+%      empirical average for $\betw(v)$
+%    \item The algorithm samples SPs efficiently according to $\prob$
+%    \item We know an upper bound to the VC-dimension and how to compute it
+%      efficiently
+%  \end{itemize}
+%  Thus we can apply the VC $\varepsilon$-sample theorem, and obtain that the algorithm
+%  outputs an $(\varepsilon,\delta)$-approximation:
+%  \[
+%    \Pr(\exists v\in V ~:~ |\tilde{\betw}(v)-\betw(v)|>\varepsilon)<\delta
+%  \]
+%\end{frame}
 
 \begin{frame}
   \frametitle{Is the bound to the VC-dimension tight?}
@@ -705,44 +758,46 @@
     \includegraphics[scale=0.3]{imgs/concertina.pdf}
   \end{figure}
   \vfill
-  Theorem: The VC-dimension of $(\mathbb{S}_{G_i}, F)$ is
-  $\lfloor\log_2\mathsf{VD}(G) -2\rfloor +1=i$
-  \vfill
-  Proof Intuition: The middle vertices are internal to a lot of SPs
+  \begin{theorem}
+   The VC-dimension of $(\mathbb{S}_{G_i}, F)$ is $\lfloor\log_2\mathsf{VD}(G)
+   -2\rfloor +1=i$
+  \end{theorem}
+  %\vfill
+  %Proof Intuition: The middle vertices are internal to a lot of SPs
 \end{frame}
 
-\begin{frame}
-  \frametitle{Is the Vertex-Diameter the right quantity?}
-  No! If $G$ undirected and for every connected pair of nodes there is a
-  unique SP, then the VC-dimension is at most 3\\
-  \quad These graphs are not just trees!
-  \vfill
-  Proof: in such a graph, two SPs that meet and separate can not meet again\\
-  \quad (+ multiple case analysis)
-  \vfill
-  The bound ``3'' is tight. In the following graph we can shatter 3 paths
-  \begin{figure}[H]
-    \centering
-    \includegraphics[scale=0.3]{imgs/uniqueshortestpathtight.pdf}
-  \end{figure}
-  \vfill
-  There is room for improvement using pseudodimension (we are working on that!)
-\end{frame}
-
-\begin{frame}
-  \frametitle{What about directed graphs?}
-  Does a similar result also hold for directed graphs with unique SP?\\
-  \quad  Not for the same constant $3$. We built a graph with unique SPs between
-  all connected nodes and we can shatter a set of $4$ SPs
-  \begin{figure}[H]
-    \centering
-    \includegraphics[scale=0.3]{imgs/uniquedirected.pdf}
-  \end{figure}
-  Yes, finding counterexamples is messy\ldots
-  \vfill
-  Does it hold for a different constant?\\
-  \quad We do not know! Maybe you can work on that?
-\end{frame}
+%\begin{frame}
+%  \frametitle{Is the Vertex-Diameter the right quantity?}
+%  No! If $G$ undirected and for every connected pair of nodes there is a
+%  unique SP, then the \emph{VC-dimension is at most 3}\\
+%  \quad These graphs are not just trees!
+%  \vfill
+%  Proof: in such a graph, two SPs that meet and separate can not meet again\\
+%  \quad (+ multiple case analysis)
+%  \vfill
+%  The bound ``3'' is tight. In the following graph we can shatter 3 paths
+%  \begin{figure}[H]
+%    \centering
+%    \includegraphics[scale=0.3]{imgs/uniqueshortestpathtight.pdf}
+%  \end{figure}
+%  \vfill
+%  There is room for improvement using pseudodimension (we are working on that!)
+%\end{frame}
+%
+%\begin{frame}
+%  \frametitle{What about directed graphs?}
+%  Does a similar result also hold for directed graphs with unique SP?\\
+%  \quad  Not for the same constant $3$. We built a graph with unique SPs between
+%  all connected nodes and we can shatter a set of $4$ SPs
+%  \begin{figure}[H]
+%    \centering
+%    \includegraphics[scale=0.3]{imgs/uniquedirected.pdf}
+%  \end{figure}
+%  Yes, finding counterexamples is messy\ldots
+%  \vfill
+%  Does it hold for a different constant?\\
+%  \quad We do not know! Maybe you can work on that?
+%\end{frame}
 
 \begin{frame}
   \frametitle{How well does the algorithm perform in practice?}
@@ -792,20 +847,20 @@
   \end{figure}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Conclusions (Betweenness Centrality)}
-  \vfill
-  We showed a sampling algorithm for betweenness centrality approximation that
-  gives probabilistic guarantees on the quality of the approximation for all
-  the vertices
-  \vfill
-  The algorithm samples SPs according to a well-defined distribution, and
-  the analysis relies on VC-dimension, which is bounded by the Vertex Diameter,
-  a characteristic quantity of the graph that is small in real networks
-  \vfill
-  The use of VC-dimension makes the algorithm much faster and more scalable
-  than previous sampling approaches and than the exact algorithm
-\end{frame}
+%\begin{frame}
+%  \frametitle{Conclusions (Betweenness Centrality)}
+%  \vfill
+%  We showed a sampling algorithm for betweenness centrality approximation that
+%  gives probabilistic guarantees on the quality of the approximation for all
+%  the vertices
+%  \vfill
+%  The algorithm samples SPs according to a well-defined distribution, and
+%  the analysis relies on VC-dimension, which is bounded by the Vertex Diameter,
+%  a characteristic quantity of the graph that is small in real networks
+%  \vfill
+%  The use of VC-dimension makes the algorithm much faster and more scalable
+%  than previous sampling approaches and than the exact algorithm
+%\end{frame}
 
 \begin{frame}
   \centering
