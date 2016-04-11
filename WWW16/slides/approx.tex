@@ -275,7 +275,7 @@
     \item The average SP distance $\closeness^{-1}(v)$ of $v$ is ``close'' to
       $\closeness^{-1}(p(v))$:
       \[
-        \closeness^{-1}(p(v))-d(v,p(v)) \le \closeness^{-1}(c) \le \closeness^{-1}(p(v))-d(v,p(v))
+        \closeness^{-1}(p(v))-d(v,p(v)) \le \closeness^{-1}(v) \le \closeness^{-1}(p(v))-d(v,p(v))
       \]
     \vspace{-20pt}
     \pause
@@ -311,9 +311,9 @@
   \pause
   The hybrid estimator is
   \begin{align*}
-    \widetilde{\closeness^{-1}}(v)=&\frac{1}{n-1}\sum_{u\in
-    H(v)}d(p(v),u)+\sum_{u\in HC(v)}d(u,v)\\
-    &+\frac{|L(v)|}{|L(v)\cap\Sam|}\sum_{u\in L(v)\cap\Sam}d(u,v)
+    \widetilde{\closeness^{-1}}(v)=&\frac{1}{n-1}\left(\sum_{u\in
+    H(v)}d(p(v),u)+\sum_{u\in HC(v)}d(u,v)\right.\\
+    &\left.+\frac{|L(v)|}{|L(v)\cap\Sam|}\sum_{u\in L(v)\cap\Sam}d(u,v)\right)
   \end{align*}
   \pause
   We have $\mathbb{E}[\widetilde{\closeness^{-1}}(v)]\neq\closeness^{-1}(v)$.
@@ -325,7 +325,7 @@
     \begin{itemize}
       \item With $k=1/\varepsilon^3$, the hybrid estimator has \emph{normalized
         RMSE} $O(\varepsilon)$.
-      \item With $k=\varepsilon^{-1}\ln n$, the maximum relative error is
+      \item With $k=\varepsilon^{-3}\ln n$, the maximum relative error is
         $O(\varepsilon)$ w.h.p.
     \end{itemize}
   \end{theorem}
@@ -502,7 +502,8 @@
   \begin{theorem}
     If
     \[
-      k\ge XXX,
+      k\ge \frac{1}{2\varepsilon^2}\left(\ln 2 + \ln n + \ln
+    \frac{1}{\delta})\right),
     \]
     then the output is a $(\varepsilon,\delta)$-approximation:
     \[
