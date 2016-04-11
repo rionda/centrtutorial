@@ -1025,7 +1025,9 @@
       connected components: the VD may have changed, recomputation is necessary
     \pause
     \item An edge is added between an existing vertex and a new vertex: the VD
-      may have increased by one, recomputation is necessary.
+      may have increased by one, recomputation is necessary (the model used in
+      this paper does not actually consider the insertion and removal of
+      vertices)
   \end{itemize}
   \pause
   Relying on the vertex diameter is not a great idea, that's why we developed
@@ -1053,7 +1055,81 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{A new data structure}
+  \frametitle{Key ideas}
+  \begin{itemize}
+    \item Still a sampling-based approximation algorithm, but samples pair of
+      vertices;
+    \item This similar to RU16, but analysis use the union bound, so
+      $O(\varepsilon^{-2}\log n)$ samples, which is a lot;
+    \item Presents a new data structure called \emph{hypergraph sketch} to keep
+      track of the SP DAGS.
+      \pause
+       \item An additional data structure, called the Two-ball Index, allows to
+      identify the parts of hypergraph sketches that require updates
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The Hypergraph Sketch}
+  (effectively a hypergraph)
+  \begin{itemize}
+    \item For each sampled pair $(s,t)$ of vertices, an \emph{hyperedge} is
+      added to the hypergraph:
+      \[
+        e_{st}=\{(v,\sigma_{sv}, \sigma_{v,t}) : v \text{ is on a SP from $s$ to
+        $t$}\}
+      \]
+      \pause
+    \item The estimations $\tbetw(v)$ can be obtained from the sketch;
+      \pause
+    \item Handling insertion and removal of edges is straightforward, but must
+      be done efficiently
+    \item Handling insertion and removal of nodes requires to change the set of
+      sampled pair of vertices, i.e., to potentially remove a hyperedge and
+      insert another one;
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Vertex Operations}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{imgs/Ayashi-pseudocode.pdf}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The Two-Ball Index}
+  \begin{itemize}
+    \item For each sampled pair $(s,t)$, maintain a triplet $(\Delta_{st},
+      \beta^+, \beta^-)$, where
+      \begin{itemize}
+        \item $\Delta_{st}=\{d(s,v), v  \text{ is on a SP from $s$ to
+        $t$}\}$
+      \item The ball $\beta^+$ is the set of vertices at distance less than some $d_s$
+        from $s$, with their distances
+      \item The ball $\beta^+$ is the set of vertices at distance less than some $d_t$
+        from $t$, with their distances
+    \end{itemize}
+  \item The radiuses of the balls are such that they do not touch and are small.
+  \item The triplets can be built with a bidirectional SP computation
+    from $s$ to $t$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Update Mechanism (for insertion)}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{imgs/Ayashi-pseudocodeupdate.pdf}
+  \end{figure}
+  \pause
+  (much more complex for deletion)
+\end{frame}
+
+\begin{frame}
+  \frametitle{Experiments}
+  \begin{figure}
+    \includegraphics[width=0.7\textwidth]{imgs/Ayashi-expers.pdf}
+  \end{figure}
 \end{frame}
 
 \begin{frame}
