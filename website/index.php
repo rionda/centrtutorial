@@ -32,7 +32,7 @@ Date();a=s.createElement(o),
 				<div id="navbar">
 					<ul>
 						<li><strong><a href="#abstract">Abstract</a></strong></li>
-						<li><strong><a href="#slides">Slides</a></strong> <!-- (Updated: <?php echo date ("M d Y", filemtime('BonchiDeFrancisciMoralesRiondato-CentralityBigGraphsTTutorial-Slides.pdf')) ?>)--></li>
+						<li><strong><a href="#slides">Slides</a></strong> (updated: <?php echo date ("M d Y", filemtime('BonchiDeFrancisciMoralesRiondato-CentralityBigGraphsTutorial-Slides.pdf')) ?>)</li>
 						<li><strong><a href="#instructors">Instructors</a></strong></li>
 						<li><strong><a href="#bibliography">Bibliography</a></strong></li>
 					</ul>
@@ -75,7 +75,7 @@ href="../papers/BonchiDeFrancisciMoralesRiondato-CentralityBigGraphsTutorial-WWW
 
 				<a name="slides"></a>
 				<h2>Slides</h2>
-				<p>We are preparing the slides, and we will post them here some weeks ahead of the conference.</p>
+				<p>Here are our <a href="BonchiDeFrancisciMoralesRiondato-CentralityBigGraphsTutorial-Slides.pdf">slides</a> (updated: <?php echo date ("M d Y", filemtime('BonchiDeFrancisciMoralesRiondato-CentralityBigGraphsTutorial-Slides.pdf')) ?>).</p>
 
 				<a name="instructors"></a>
 				<h2>Instructors</h2>
