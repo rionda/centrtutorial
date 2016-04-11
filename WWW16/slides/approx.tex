@@ -85,8 +85,8 @@
     \begin{itemize}
       \item What ``objects'' to sample?
         \pause
-      \item How to sample? If sampling procedure is slow, then the advantages
-        are lost;
+      \item How to sample?\\
+        \quad If sampling procedure is slow, then the advantages are lost;
         \pause
       \item How many objects to sample in order to guarantee an
         $(\varepsilon,\delta)$-approximation?
@@ -179,28 +179,28 @@
   \end{block}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Hoeffding Inequality}
-  \begin{itemize}
-    \item A concentration inequality for the sum of independent random
-      variables;
-    \item It allows to study the trade-off between the error (difference between
-      sample value and expectation) and the sample size;
-  \end{itemize}
-  \pause
-  \begin{theorem}[Hoeffding Inequality]
-    Let $x_1,\dotsc, x_n$ be independent r.v., with
-    \begin{itemize}
-      \item $a_i\le x_i\le b_i$
-      \item $\mu=\mathbb{E}[\sum x_i/k]$
-    \end{itemize}
-    Then, for $\xi > 0$,
-    \[
-      \Pr\left(\left|\frac{\sum_{i=1}^kx_i}{k}-\mu\right|\ge\xi\right)\le
-      2e^{-2k^2\xi^2/\sum_{i=1}^k(b_i-a_i)^2}
-    \]
-  \end{theorem}
-\end{frame}
+%\begin{frame}
+%  \frametitle{Hoeffding Inequality}
+%  \begin{itemize}
+%    \item A concentration inequality for the sum of independent random
+%      variables;
+%    \item It allows to study the trade-off between the error (difference between
+%      sample value and expectation) and the sample size;
+%  \end{itemize}
+%  \pause
+%  \begin{theorem}[Hoeffding Inequality]
+%    Let $x_1,\dotsc, x_n$ be independent r.v., with
+%    \begin{itemize}
+%      \item $a_i\le x_i\le b_i$
+%      \item $\mu=\mathbb{E}[\sum x_i/k]$
+%    \end{itemize}
+%    Then, for $\xi > 0$,
+%    \[
+%      \Pr\left(\left|\frac{\sum_{i=1}^kx_i}{k}-\mu\right|\ge\xi\right)\le
+%      2e^{-2k^2\xi^2/\sum_{i=1}^k(b_i-a_i)^2}
+%    \]
+%  \end{theorem}
+%\end{frame}
 
 \begin{frame}
   \frametitle{How much to sample}
@@ -208,16 +208,24 @@
     Let $\Delta$ be the diameter of the graph and let
     $\varepsilon,\delta\in(0,1)$. If
     \[
-      k=\Theta\left(\frac{\log n}{\varepsilon^2}\right),
+      k\ge\frac{2}{\varepsilon^2} \left(\ln 2 + \ln n +
+      \ln\frac{1}{\delta}\right)
     \]
-    Then, \emph{with high probability} (i.e., with probability $\ge 1/n$)
+    Then, with probability at least $1-\delta$
     \[
-      \left|\widetilde{\closeness^{-1}}(v)-\closeness^{-1}(v)\right|\le\Delta\varepsilon,
-      \text{ for all } v\in V
+      \left|\widetilde{\closeness^{-1}}(v)-\closeness^{-1}(v)\right| \le
+      \Delta\varepsilon, \text{ for all } v\in V
     \]
   \end{lemma}
   \pause
-  Algorithm running time: $O\left(\frac{\log n}{\varepsilon^2}(n\log n +
+  \begin{block}{Proof}
+    \begin{enumerate}
+      \item \emph{Hoeffding inequality} to bound the error of a single vertex;
+      \item \emph{Union bound} to get uniform guarantees.
+    \end{enumerate}
+  \end{block}
+  \pause
+  Running time: $O\left(\frac{\log n - \log \delta}{\varepsilon^2}(n\log n +
   m)\right)$.
 \end{frame}
 
@@ -235,38 +243,111 @@
 \begin{frame}
   \frametitle{Issues with sampling}
   \begin{itemize}
-    \item Assume that the distance distribution from a node $v$ has a
-      \emph{heavy tail};
-    \item the average distance
+    \item Assume that the distance distribution from a vertex $v$ has a
+      \emph{heavy tail}, then the average distance
       \[
         \closeness^{-1}(v)=\frac{\sum_{u\neq v}d(u,v)}{n-1}\enspace
       \]
-      is dominated by few distant nodes;
+      is dominated by few distant vertices;
     \pause
-    \item it is unlikely that these nodes are among the ones that are sampled
-    \pause
+    \item it is unlikely that these vertices are among the $k$ that are sampled
     \item Hence the sample average
       \[
-        \widetilde{\closeness^{-1}}(v)=\frac{n-1}{n}\frac{\sum_{i=1}d(u_i,v)}{k}
+        \widetilde{\closeness^{-1}}(v)=\frac{n}{n-1}\frac{\sum_{i=1}^k
+        d(u_i,v_i)}{k}
       \]
       is a \emph{poor estimator} of the average distance $\closeness^{-1}(v)$.
+    \pause
+    \item Sampling along can't give us \emph{small relative error}
   \end{itemize}
 \end{frame}
 
 \begin{frame}
   \frametitle{Pivoting}
+  \begin{definition}{Pivot}
+    The \emph{pivot} $p(v)$ of a vertex $v$ is the sampled vertex which is
+    closest to $v$ ($p(v)\in\Sam$).
+  \end{definition}
+  \begin{itemize}
+    \item We have the exact value of $\closeness^{-1}(p(v))$, can we leverage
+      it?
+    \pause
+    \item The average SP distance $\closeness^{-1}(v)$ of $v$ is ``close'' to
+      $\closeness^{-1}(p(v))$:
+      \[
+        \closeness^{-1}(p(v))-d(v,p(v)) \le \closeness^{-1}(c) \le \closeness^{-1}(p(v))-d(v,p(v))
+      \]
+    \vspace{-20pt}
+    \pause
+    \item One can actually prove that, with high probability,
+      \[
+        \closeness^{-1}(p(v))+d(v,p(v))\le 3\closeness^{-1}(v)+O(1)
+      \]
+      \vspace{-20pt}
+  \end{itemize}
+  \pause
+  Pivoting by itself is not satisfactory: the relative error is still somewhat
+  large.
+  \vfill
+  \pause
+  Idea: \emph{combine sampling and pivoting} into a hybrid estimator
 \end{frame}
 
 \begin{frame}
   \frametitle{Hybrid Estimator}
+  For each vertex $v$ with pivot $p(v)$, split the set $V\setminus\Sam$ into
+  three sets:
+  \pause
+  \begin{itemize}
+    \item $L(v)$: vertices in $V\setminus\Sam$ at distance at most $d(v,p(v))$
+      from $p(v)$;
+    \pause
+    \item $HC(v)$: vertices in $\Sam$ with distance greater than $d(v,p(v))$
+      from $p(v)$.
+    \pause
+    \item $H(v)$: vertices in $V\setminus\Sam$ at distance greater than
+      $d(v,p(v))$ from $p(v)$.
+  \end{itemize}
+  \pause
+  The hybrid estimator is
+  \begin{align*}
+    \widetilde{\closeness^{-1}}(v)=&\frac{1}{n-1}\sum_{u\in
+    H(v)}d(p(v),u)+\sum_{u\in HC(v)}d(u,v)\\
+    &+\frac{|L(v)|}{|L(v)\cap\Sam|}\sum_{u\in L(v)\cap\Sam}d(u,v)
+  \end{align*}
+  \pause
+  We have $\mathbb{E}[\widetilde{\closeness^{-1}}(v)]\neq\closeness^{-1}(v)$.
 \end{frame}
 
 \begin{frame}
   \frametitle{Guarantees}
+  \begin{theorem}
+    \begin{itemize}
+      \item With $k=1/\varepsilon^3$, the hybrid estimator has \emph{normalized
+        RMSE} $O(\varepsilon)$.
+      \item With $k=\varepsilon^{-1}\ln n$, the maximum relative error is
+        $O(\varepsilon)$ w.h.p.
+    \end{itemize}
+  \end{theorem}
 \end{frame}
 
 \begin{frame}
   \frametitle{Experiments}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{imgs/cohenhybrid.pdf}
+  \end{figure}
+  The hybrid estimator is better than just-sampling and just-pivoting.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Summary for closeness}
+  \begin{itemize}
+    \item Sampling can help, but not alone
+    \item Pivoting alone is not good
+    \item The hybrid approach is promising, but the sample size results are
+      somewhat disappointing (very large sample sizes!)
+  \end{itemize}
+  More work to do!
 \end{frame}
 
 \begin{frame}
