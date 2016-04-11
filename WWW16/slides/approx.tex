@@ -976,11 +976,68 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Saving all the DAGS}
+  \frametitle{Key ideas}
+  This algorithm builds on:
+  \begin{itemize}
+    \item the RK sampling-based approximation algorithm;
+    \item existing algorithms to update the SP DAG after an insertion/removal of
+      a batch of edges;
+  \end{itemize}
+  \pause
+  \vfill
+  It keeps track of potential modifications to the vertex diameter to
+  understand whether to increase the sample size;
+  \pause
+  \vfill
+  \begin{theorem}
+    After each batch update, the output is an
+    $(\varepsilon,\delta)$-approximation.
+  \end{theorem}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Recomputing the vertex diameter}
+  \frametitle{Updating the DAGs}
+  \begin{itemize}
+    \item Never change the set of sampled pairs of vertices, unless a sample was removed
+      or more samples are needed
+    \item What can change is which SP is sampled: if an edge is added, the path
+      we sampled before may no longer be a SP.
+      \pause
+    \item In any case, must save \emph{all the SP DAGs} between the sampled
+      pair of nodes
+      \pause
+    \item Requires a lot of memory, but is needed in order to be able to update
+      the estimation after the batch update
+    \item The update computation builds on existing algorithms
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Keeping track of the vertex diameter}
+  \begin{itemize}
+    \item An edge is removed: the VD may decrease, but no need to change the
+      sample size;
+    \pause
+    \item An edge is added between two existing vertices in the same connected
+      component: no change in the VD, hence no change in sample size
+    \pause
+    \item An edge is added between two existing vertices in two different
+      connected components: the VD may have changed, recomputation is necessary
+    \pause
+    \item An edge is added between an existing vertex and a new vertex: the VD
+      may have increased by one, recomputation is necessary.
+  \end{itemize}
+  \pause
+  Relying on the vertex diameter is not a great idea, that's why we developed
+  ABRA, the Rademacher Averages-based algorithm.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Experiments}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{imgs/Bergamini-speedup.pdf}
+  \end{figure}
+  Speedup over RK
 \end{frame}
 
 \begin{frame}
