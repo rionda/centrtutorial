@@ -45,41 +45,41 @@
 %\setbeamercolor{framesubtitle}{fg=blue}
 \setbeamertemplate{frametitle}
 {
-\begin{centering}
-\insertframetitle\par
-\insertframesubtitle\par
-\end{centering}
+  \begin{centering}
+    \insertframetitle\par
+    \insertframesubtitle\par
+  \end{centering}
 }
 \beamertemplatenavigationsymbolsempty
 
 %% slide number
 \addtobeamertemplate{navigation symbols}{}{%
-    \usebeamerfont{footline}%
-    \usebeamercolor[fg]{footline}%
-    \hspace{1em}%
-    \insertframenumber/\inserttotalframenumber
+  \usebeamerfont{footline}%
+  \usebeamercolor[fg]{footline}%
+  \hspace{1em}%
+  \insertframenumber/\inserttotalframenumber
 }
 \setbeamertemplate{caption}{\raggedright\insertcaption\par} % remove "Figure" in captions
 
 \AtBeginSection[]{
   \begin{frame}
-  \vfill
-  \centering
-  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
-    \usebeamerfont{title}\insertsectionhead\par%
-  \end{beamercolorbox}
-  \vfill
+    \vfill
+    \centering
+    \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+      \usebeamerfont{title}\insertsectionhead\par%
+    \end{beamercolorbox}
+    \vfill
   \end{frame}
 }
 
 \AtBeginSubsection[]{
   \begin{frame}
-  \vfill
-  \centering
-  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
-    \usebeamerfont{title}\insertsubsectionhead\par%
-  \end{beamercolorbox}
-  \vfill
+    \vfill
+    \centering
+    \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+      \usebeamerfont{title}\insertsubsectionhead\par%
+    \end{beamercolorbox}
+    \vfill
   \end{frame}
 }
 
@@ -123,11 +123,11 @@
     Algorithms}{Centrality Measures on Big Graphs: Exact, Approximated, and Distributed
 Algorithms}}
 \author[Bonchi, De Francisci Morales, Riondato]{\texorpdfstring{Francesco Bonchi\inst{1,2}\\ \and
-  Gianmarco De Francisci Morales\inst{3}\\ \and Matteo
-Riondato\inst{4}}{Francesco Bonchi, Gianmarco De Francisci Morales, and Matteo
+    Gianmarco De Francisci Morales\inst{3}\\ \and Matteo
+    Riondato\inst{4}}{Francesco Bonchi, Gianmarco De Francisci Morales, and Matteo
 Riondato}}
 \date[WWW'16]{WWW'16 -- Montr\'eal, April 11--15, 2016}
-  \institute[ISI, Qatar Computing Research Institute, Two Sigma]{
+\institute[ISI, Qatar Computing Research Institute, Two Sigma]{
   \inst{1} ISI Foundation, Turin (Italy)
   \and
   \inst{2} Eurecat, Technological Center of Catalonia, Barcelona (Spain)
@@ -142,28 +142,24 @@ Riondato}}
   \titlepage
 \end{frame}
 
-%---------------------------------------------------------------------- SLIDE -
+\begin{frame}
+  \begin{block}{\centering \huge Slides available at}
+    \huge
+    \centering  http://matteo.rionda.to/centrtutorial/
+  \end{block}
+\end{frame}
 
 \frame{
   \frametitle{Acknowledgements}
-
-\begin{itemize}
-  \item Paolo Boldi
-  \item Andreas Kaltenbrunner
-  \item Evgenios M. Kornaropoulos
-  \item Nicolas Kourtellis
-  \item Eli Upfal
-  \item Sebastiano Vigna
-\end{itemize}
-
+  \begin{itemize}
+    \item Paolo Boldi
+    \item Andreas Kaltenbrunner
+    \item Evgenios M. Kornaropoulos
+    \item Nicolas Kourtellis
+    \item Eli Upfal
+    \item Sebastiano Vigna
+  \end{itemize}
 }
-
-\begin{frame}
-\begin{block}{\centering \huge Slides available at}
-  \huge
-\centering  http://matteo.rionda.to/centrtutorial/
-\end{block}
-\end{frame}
 
 \include{intro}
 % Contains
