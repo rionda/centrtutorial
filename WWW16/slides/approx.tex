@@ -877,12 +877,13 @@
 \begin{frame}
   \frametitle{Issues with RK approach}
   \begin{itemize}
-    \item For each $s-t$ SP computation, we only use a single path
+    \item For each $s-t$ SP computation, we only \emph{use a single SP}
       \begin{itemize}
-        \item wasted work
+        \item a lot of wasted work!
       \end{itemize}
       \pause
-    \item Before we can start sampling ,we need to compute the vertex diameter
+    \item Must compute (upper bound to) the vertex-diameter before we can start
+      sampling
       \begin{itemize}
         \item Exact computation cannot be done (would be equivalent to obtain
           exact betweenness)
@@ -897,108 +898,68 @@
   \begin{itemize}
     \item Design a sample scheme that uses \emph{all SPs} between a sampled pair
       of vertices
+    \pause
     \item Use \emph{progressive sampling}, rather than static sampling
       \begin{itemize}
-        \item XXX
-        \item XX
+        \item Start from small sample size
+        \item Check \emph{stopping condition} to verify whether we sampled
+          enough to get a $(\varepsilon,\delta)$-approximation
+        \item If yes, stop, otherwise keep sampling.
       \end{itemize}
   \end{itemize}
   \pause
-  How to achieve this: using \emph{Rademacher averages}
+  How to achieve this: using \emph{Rademacher averages} (VC-dimension on
+  steroids)
 \end{frame}
 
 \begin{frame}
-  \frametitle{What are Rademacher Averages?}
-  A measure of complexity of the data analysis task (FIM, in our case)
-  w.r.t.~sampling\\
-  \quad \inblue{VC-dimension on steroids}
-  \vfill
-  Definition is \inblue{hairy}: Let $\Sam=\{\tau_1,\dotsc,\tau_{|\Sam|}\}$, the Rademacher
-  Average on $\Sam$ is
-  \[
-    \inblue{\Rade(\Sam)=\expectation_\sigma\left[\sup_{A\subseteq\mathcal{I}}\frac{1}{\ell}\sum_{j=1}^{|\Sam|}
-    \sigma_j \phi_A(\tau_j)\left|\right. \Sam\right]}
-  \]
-  where the $\sigma_i$ are Rademacher rv's and $\phi_A(\tau_i)=\mathds{1}_{\tau_j}(A)$
-  \vfill
-  The \inblue{important part}: $\Rade(\Sam)$ is a \inblue{sample-dependent
-  quantity} and we have:
-  \[
-    %		\Pr\left(\displaystyle\sup_{A\subseteq\mathcal{I}}|f_\Ds(A)-f_\Sam(A)|\le\inblue{\underbrace{2\Rade(\Sam)
-    %			+\displaystyle\sqrt{\frac{2\ln(2/\delta)}{|\Sam|}}}_\eta}\right)\ge 1-\delta
-  \]
-  We develop a method to \inblue{efficiently compute an upper bound to
-  $\Rade(\Sam)$}\\
-  \quad So we can compute $\eta$ and \inblue{efficiently check the stopping condition ``$\eta\le\varepsilon/2$?''}
+  \frametitle{Key ideas}
+  \begin{itemize}
+    \item When backtracking from $t$ to $s$, follow all SPs, not just one of
+      them, and increase the estimation of all vertices found along the way: no
+      wasted work;
+    \pause
+    \item  The stopping condition depends on:
+      \begin{itemize}
+        \item the \emph{richness} of the vectors representing the current
+          estimates of the betweenness of all vertices
+        \pause
+        \item the current sample size
+        \pause
+      \item Formulas like this:
+        \[
+          \frac{1}{1-\alpha}\min_{s\in\mathbb{R}^+}\frac{1}{s}\ln\sum_{\mathbf{v}\in\mathcal{V}_\Sam}\mathrm{exp}(s^2\|\mathbf{v}\|^2/(2\ell^2))
+          +\frac{\ln\frac{2}{\delta}}{2\ell\alpha(1-\alpha)}+\sqrt{\frac{\ln{2/\delta}}{2\ell}}
+        \]
+      \end{itemize}
+    \pause
+    \item But it works!
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
-  \frametitle{How can we bound the Rademacher average?}
-  We must compute the bound \inblue{efficiently} or we lose the advantages of sampling
-  \vfill
-  Constraint: We can use \inblue{only} information that can be obtained with a
-  \inblue{single scan of $\Sam$}:\\
-  \begin{enumerate*}
-    \item $\inblue{F_\Sam}$: Frequencies in the sample of the single items ($F_\Sam=\{f_\Sam(a),
-      a\in\mathcal{I}\}$)
-    \item $\inblue{L_\Sam}$: Lengths of the transactions in $\Sam$ ($L_\Sam=\{|\tau|, \tau\in\Sam\}$)
-  \end{enumerate*}
-  \vfill
-  We use the above and \inblue{a variant of Massart's Lemma} to compute a
-  function \inblue{$w$} such that:
-  \[
-    \inblue{
-    \Rade(\Sam)\le \min_{s\in\mathbb{R}^+} w(s,F_\Sam,L_\Sam)
-    }
-  \]
-  The function \inblue{$w$ is convex} so \inblue{we can minimize it efficiently}
-  \vfill
-  Then we have $\eta= 2 \displaystyle\min_{s\in\mathbb{R}^+} w(s,F_\Sam,L_\Sam) +
-  \displaystyle\sqrt{\frac{2\ln(2/\delta)}{|\Sam|}}$ and we stop sampling when
-  $\eta\le\varepsilon/2$
+  \frametitle{Experiments}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{imgs/RiondatoU-table.pdf}
+  \end{figure}
+  \begin{itemize}
+    \item Smaller sample sizes than RK
+    \item Much faster (not just because using smaller sample, also because no
+      need to compute the vertex-diameter)
+    \item Very accurate
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
-  \frametitle{What is the intuition behind $w$?}
-  Lemma: $\Rade(\Sam)$ is a function of the frequency distribution of the
-  Closed Itemsets in $\Sam$
-  \vfill
-  The function $w$ is an upper bound to $\Rade(\Sam)$ using information from the sample
-  \begin{enumerate}
-    \item We use the lengths of the transaction in the sample to understand
-      how many CIs there are for each possible frequency
-    \item We use the frequencies of the items to bound the frequencies of
-      the CIs (anti-monotonicity)
-  \end{enumerate}
-  This does not require us to compute the CIs from $\Sam$ (they are only for the
-  analysis)
-  \vfill
-  \pause
-  By the way, here's $w$:
-  \[
-    \inblue{
-    w(s) =
-    \frac{1}{s}\ln\displaystyle\sum_{a\in\mathcal{I}_\Sam}\left(\left(1+\displaystyle\sum_{r=1}^{\chi_a}\displaystyle\sum_{j=1}^{g_{a,r}}2^{\min\{r,h_{a,r}-j\}}\right)e^{\frac{s^2f_\Sam(a)}{2n}}\right)
-    }
-  \]
-  See the paper for details :-)
-\end{frame}
-
-\begin{frame}
-  \frametitle{How to choose the next sample size ?}
-  Prev.~works used a fixed sample schedule increasing according to a user-specified parameter\\
-  \quad We can \inblue{compute the next sample size on the fly}: one fewer parameter!
-  \vfill
-  \inblue{First iteration}: Use a sample $\Sam$ of size at least
-  \inblue{$|\Sam|\ge8\displaystyle\frac{\ln(2/\delta)}{\varepsilon^2}$}\\
-  \quad Why? It is \inblue{impossible that $\eta\le\varepsilon/2$ at
-  smaller sample sizes}
-  \vfill
-  \inblue{Successive iterations}: multiply the sample size from the previous
-  iteration by $\displaystyle\left(\frac{2\eta}{\varepsilon}\right)^2$\\
-  \inblue{Intuition:} If the \inblue{frequencies of the items} in the current iteration
-  and the \inblue{distribution of the transaction lengths} are the \inblue{same as in the previous
-  iteration}, then the stopping condition will be satisfied at this iteration
+  \frametitle{Experiments}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{imgs/epinions-error.pdf}
+  \end{figure}
+  \begin{itemize}
+    \item More than 10x more accurate than guaranteed, on average;
+    \item More than 100x more accurate than guaranteed, in the best case;
+    \item Close to the guarantee in the worst case: this is good.
+  \end{itemize}
 \end{frame}
 
 \subsection{Approximation Algorithms for Dynamic Graphs}
